@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from ttkbootstrap.constants import *
 import ttkbootstrap as tb
-import ttkbootstrap.window as tbw
 from ttkbootstrap.scrolled import ScrolledFrame
+from inventory_windows import AddItems
 
 staff = ['User', 'Cheryl', 'Sarah', 'Lauren', 'Nicola']
 
@@ -51,7 +51,7 @@ class DashBoard(tb.Frame):
         lf_bottom_title = tb.Label(self.lf_bottom, text="Manage Inventory", anchor='center').grid(column=1, row=0, sticky='ew')
         lf_rmvItem = tb.Button(self.lf_bottom, text='-').grid(column=0, row=1, sticky='nsew')
         lf_Inspect = tb.Button(self.lf_bottom, text='Inspect').grid(column=1, row=1, sticky='nsew')
-        lf_addItem = tb.Button(self.lf_bottom, text='+').grid(column=2, row=1, sticky='nsew')
+        lf_addItem = tb.Button(self.lf_bottom, text='+', command=lambda:AddItems(self)).grid(column=2, row=1, sticky='nsew')
 
         # right frame section start
         self.right_frame = tb.Frame(self, border=2, height=700, width=400)
