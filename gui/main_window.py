@@ -9,6 +9,7 @@ staff = ['User', 'Cheryl', 'Sarah', 'Lauren', 'Nicola']
 
 class DashBoard(tb.Frame):
     def __init__(self, container):
+        
         super().__init__(container, border=2, height=600, width=800, bootstyle="primary")   
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
@@ -52,6 +53,8 @@ class DashBoard(tb.Frame):
         lf_rmvItem = tb.Button(self.lf_bottom, text='-').grid(column=0, row=1, sticky='nsew')
         lf_Inspect = tb.Button(self.lf_bottom, text='Inspect').grid(column=1, row=1, sticky='nsew')
         lf_addItem = tb.Button(self.lf_bottom, text='+', command=lambda:AddItems(self)).grid(column=2, row=1, sticky='nsew')
+        self.bind("<Control-Return>", lambda event: lf_addItem.invoke())    
+        
 
         # right frame section start
         self.right_frame = tb.Frame(self, border=2, height=700, width=400)
