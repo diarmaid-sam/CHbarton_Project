@@ -136,7 +136,7 @@ class MainFrame(tb.Frame):
         frame = self.frames[cont]
         frame.tkraise()
 
-    def __navBar(self):
+    def __navBar(self): 
         self.navBar = tb.Frame(self, border=2, padding=10, height=100, width=800)
         self.navBar.grid(column=0, row=0, sticky='ew')
         nav_dashboard = ttk.Button(self.navBar, text="Dashboard", padding=(15, 20), command=lambda:self.show_frame(DashBoard), bootstyle="outline").grid(column=0, row=0, sticky='ew')
