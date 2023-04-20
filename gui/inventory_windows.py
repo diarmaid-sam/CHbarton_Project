@@ -93,11 +93,30 @@ class AddItems(tb.Toplevel):
         # variable to store the inputs of the digit panel   
         self.date = StringVar()
         self.quantity = StringVar()
+    
+        self.date.set("month/year")
+        self.quantity.set("e.g. 12")
 
-        self.date_label = tb.Label(self.input_display, textvariable=self.date, border=1, relief='solid', padding=10)
-        self.date_label.grid(column=0, row=0, sticky='nsew', pady=5, padx=5)
-        self.quantity_label = tb.Label(self.input_display, textvariable=self.quantity, border=1, relief='solid', padding=10)
-        self.quantity_label.grid(column=0, row=1, sticky='nsew', pady=(0, 5), padx=5)
+        self.date_frame = tb.LabelFrame(self.input_display, text=" Date ",border=1, relief='solid', padding=10)
+        self.date_frame.columnconfigure(0, weight=1)
+        self.date_frame.rowconfigure(0, weight=1)
+        self.date_frame.grid(column=0, row=0, sticky='nsew', pady=5, padx=5)
+
+        self.quantity_frame = tb.LabelFrame(self.input_display, text=" Quantity ",border=1, relief='solid', padding=10)
+        self.quantity_frame.columnconfigure(0, weight=1)
+        self.quantity_frame.rowconfigure(0, weight=1)
+        self.quantity_frame.grid(column=0, row=1, sticky='nsew', pady=5, padx=5)
+
+        self.date_label = tb.Label(self.date_frame, textvariable=self.date)
+        self.date_label.grid(column=0, row=0, sticky='ns')
+        self.quantity_label = tb.Label(self.quantity_frame, textvariable=self.quantity)
+        self.quantity_label.grid(column=0, row=0, sticky='ns')
+
+        self.date_label.config(font=(20))
+        self.quantity_label.config(font=(20))
+
+        
+
     
         
         # create instance of calc_layout class so that we can access methods (to then modify text here)
@@ -109,7 +128,7 @@ class AddItems(tb.Toplevel):
         # 1) add more items? (enables for another item to be scanned and then for the process to start again)
         # 2) finish session (closes the pop-up, when all items to be added are done so)
         self.buttons = tb.Frame(self.adding_frame, width=((1000*3)/8), height=(800), border=8, relief='solid', padding=(10, 5))
-        self.buttons.grid(column=1, row=1, sticky='ew', padx=(20,0))
+        self.buttons.grid(column=1, row=1, sticky='ew', padx=(20,10))
         self.buttons.columnconfigure(0, weight=1)
         self.buttons.rowconfigure(0, weight=1)
         self.buttons.rowconfigure(1, weight=1)
