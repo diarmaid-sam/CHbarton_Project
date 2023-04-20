@@ -14,33 +14,63 @@ class AddItems(tb.Toplevel):
         super().__init__(title="Add Items", size=(1000, 800), resizable=(False, True))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)  
-        global var_placeholder
-        var_placeholder = ""
+        global placeholder_list
+        global calc_key1
+        # lists are necessary as updating values using int or str data_types causes issues
+        placeholder_list = ['', '']
+        calc_key1 = [0]
         
         
         self.AddItem_frame()
         self.grid()
 
-    # function to update the date text box
-    
-    def update_date(self, num, placeholder_list, date):
+    def calcAPI(self, *args, key1, key2, placeholder_list):
+        if key2 == "add":
+            # if you are entering the expirey date string, the following rules apply (and the relevant date widget is updated)
+            if key1 == 0:
+                # 7 is max characters for the date, hence it prevents further input once 7 characters is reached
+                if len(placeholder_list[key1]) == 7:
+                    return placeholder_list[key1]
+                # stops the addition of a number if it has reached max 7
+                placeholder_list[key1] += args[0]
+                # if 2 characters is reached, is implies the month is entered, and so a slash is automatically entered
+                if len(placeholder_list[key1]) == 2:
+                    placeholder_list[key1] += '/'
+                self.date.set(placeholder_list[key1])
+                return placeholder_list
+            # else, you modify the quantity label widget
+            else:
+                placeholder_list[key1] += args[0]
+                self.quantity.set(placeholder_list[key1])
+                return placeholder_list
+                
+        elif key2 == "back":            
+            # if the last value of the string is a '/' char, remove an additional char from the str
+            if len(placeholder_list[key1]) > 0:
+                if placeholder_list[key1][-1] == '/':
+                    placeholder_list[key1] = placeholder_list[key1][:-1] 
 
-        # if the date entered is complete (i.e. 7 digits reached), then prevent user from entering any more
-        if len(placeholder_list) == 7:
-            return placeholder_list
-        
-        # placeholder_list here is updated before the actual Date is changed
-        # placeholder_list changes the date, but doesn't permanently change (globally)
-        placeholder_list += num
+                # even if none of the above apply, still remove the last digit
+                placeholder_list[key1] = placeholder_list[key1][:-1]
+                # update value of label widget
+                if key1 == 0:
+                    self.date.set(placeholder_list[key1])
+                else:
+                    self.quantity.set(placeholder_list[key1])
 
-        # placing '/' at relevant positions when typing in the expirey date
-        if len(placeholder_list) == 2:
-            placeholder_list += "/"
-        
-        # updating the date using set method
-        date.set(placeholder_list)
-
-        return placeholder_list
+                return placeholder_list
+            
+            # if you backspace on an empty 'quantity string' then it will take you back to the 'expirey date string'
+            if key1 == 1:
+                calc_key1[0] = 0
+                # calc_key is updated as is the global variable keeping track of the key1 value
+        # else = when the done button is pressed.
+        else:
+            if key1 == 1:
+                return# TODO: probably pass the date and quantity info into the database
+            elif len(placeholder_list[key1]) == 7:
+                calc_key1[0] = 1
+                return
 
         
     # This frame is the one where (once the item type is confirmed) the item's quantity and expiry date are inputted and put into the database
@@ -71,7 +101,7 @@ class AddItems(tb.Toplevel):
     
         
         # create instance of calc_layout class so that we can access methods (to then modify text here)
-        digitPanel = calc_layout(master=self.adding_frame, width=((1000*6)/8), height=((800*6)/7), function1=self.update_date, placeholder_list=[var_placeholder], f1_var1=self.date)
+        digitPanel = calc_layout(master=self.adding_frame, width=((1000*6)/8), height=((800*6)/7), API=self.calcAPI, key1=calc_key1, placeholder_list=placeholder_list)
         digitPanel.grid(column=0, row=1, padx=25, pady=18, sticky='nsew')
 
       
