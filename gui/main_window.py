@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import ttk
 from ttkbootstrap.constants import *
 import ttkbootstrap as tb
@@ -100,36 +101,42 @@ class DashBoard(tb.Frame):
 
 class Inventory(ttk.Frame):
     def __init__(self, container):
-        super().__init__(container, height=600, width=800, bootstyle="secondary")
+        super().__init__(container, height=600, width=800)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
         # top frame for navigation of the inventory table
-        self.utility_frame = tb.Frame(self, border=2, relief='solid', bootstyle='secondary')
-        self.utility_frame.grid(column=0, row=0, sticky='new')
-        self.utility_frame.columnconfigure(0, weight=12)
-        self.utility_frame.columnconfigure(1, weight=4)
-        self.utility_frame.rowconfigure(0, weight=1)
+        self.inventory_top_frame = tb.Frame(self)
+        self.inventory_top_frame.grid(column=0, row=0, sticky='new', pady=(10, 15))
+        self.inventory_top_frame.columnconfigure(0, weight=12)
+        self.inventory_top_frame.columnconfigure(1, weight=2)
+        self.inventory_top_frame.columnconfigure(2, weight=4)
+        self.inventory_top_frame.rowconfigure(0, weight=1)
         
-        # search bar section of the  utility frame (contains search bar, sort by button and filter by button)
-        self.search_bar_frame = tb.Frame(self.utility_frame)
-        self.search_bar_frame.grid(column=0, row=0, sticky='nsew')
-        self.search_bar_frame.columnconfigure(0, weight=12)
-        self.search_bar_frame.columnconfigure(1, weight=3)
-        self.search_bar_frame.columnconfigure(2, weight=3)
         # widgets (entry and buttons) for the search bar
-        search_entry = tb.Entry(self.search_bar_frame, bootstyle='secondary')
-        search_entry.grid(column=0, row=0, sticky='nsew')
-        sortBy_btn = tb.Button(self.search_bar_frame, text='sort by', bootstyle='secondary')
-        sortBy_btn.grid(column=1, row=0, sticky='nsew', padx=3, pady=5)
-        filterBy_btn = tb.Button(self.search_bar_frame, text='filter by', bootstyle='secondary')
-        filterBy_btn.grid(column=2, row=0, sticky='nsew', padx=2, pady=5)
+        inventory_title = tb.Label(self.inventory_top_frame, text="S h o p    I n v e n t o r y", bootstyle='light', padding=10)
+        inventory_title.grid(column=0, row=0, sticky='ew')
+        
+        # configuring the style of inventory_title label. this code snippet underlines and increases text size to 20
+        my_font = tkfont.Font(inventory_title, inventory_title.cget("font"))
+        my_font.configure(underline=True)
+        my_font.configure(size=(20))
+
+        inventory_title.config(font=(my_font))
+        
+
+        inventory_filter_by = tb.Menubutton(self.inventory_top_frame, text='Filter By', padding=(4, 10, 0, 10), bootstyle='warning')
+        inventory_filter_by.grid(column=1, row=0, sticky='ew')
 
         # add item button of the utility frame
-        add_button = tb.Button(self.utility_frame, padding=10, text="Add", command=lambda:AddItems(self), bootstyle='success')
-        add_button.grid(column=1, row=0, sticky='nsew', padx=(10))
+        add_button = tb.Button(self.inventory_top_frame, text="Add", padding=(0, 10), command=lambda:AddItems(self), bootstyle='success')
+        add_button.grid(column=2, row=0, sticky='ew', padx=(10))
+
+        separator = tb.Separator(self.inventory_top_frame, bootstyle='light')
+        separator.grid(column=0, row=1, sticky='nsew', columnspan=3, pady=(10,0))
 
         # table of entire shop_inventory.db
+        # column headers for table
         coldata = [
                     "Product Name", 
                    {"text": "expiry date", "stretch": "false"}, 
@@ -138,6 +145,7 @@ class Inventory(ttk.Frame):
                    {"text": "time added", "stretch": "false"}
                    ]
         
+        # TODO: row data for table. Currently filled with placeholder values (import from shop_inventory.db database)
         rowdata = [
             ('A123', 'IzzyCo', 12, 'delta', 'dieeye'),
             ('A136', 'Kimdee Inc.', 45, 'delta', 'dieeye'),
@@ -149,7 +157,8 @@ class Inventory(ttk.Frame):
         self.inventory_table = tbtable.Tableview(master=self,
                                                  coldata=coldata,
                                                  rowdata=rowdata,
-                                                 stripecolor=('black', 'white')
+                                                 searchable='true',
+                                                 stripecolor=('gray', 'white')
                                                       )
         self.inventory_table.grid(column=0, row=1, sticky='nsew')
 
