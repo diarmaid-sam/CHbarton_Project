@@ -125,11 +125,11 @@ class Inventory(ttk.Frame):
         inventory_title.config(font=(my_font))
         
 
-        inventory_filter_by = tb.Menubutton(self.inventory_top_frame, text='Filter By', padding=(4, 10, 0, 10), bootstyle='warning')
+        inventory_filter_by = tb.Menubutton(self.inventory_top_frame, text='Filter By', padding=(4, 10, 0, 10), bootstyle='outline-warning')
         inventory_filter_by.grid(column=1, row=0, sticky='ew')
 
         # add item button of the utility frame
-        add_button = tb.Button(self.inventory_top_frame, text="Add", padding=(0, 10), command=lambda:AddItems(self), bootstyle='success')
+        add_button = tb.Button(self.inventory_top_frame, text="Add", padding=(0, 10), command=lambda:AddItems(self), bootstyle='outline-success')
         add_button.grid(column=2, row=0, sticky='ew', padx=(10))
 
         separator = tb.Separator(self.inventory_top_frame, bootstyle='light')
