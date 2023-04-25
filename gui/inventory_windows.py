@@ -66,8 +66,15 @@ class AddItems(tb.Toplevel):
                 # calc_key is updated as is the global variable keeping track of the key1 value
         # else = when the done button is pressed.
         else:
-            if key1 == 1:
-                return# TODO: probably pass the date and quantity info into the database
+            if key1 == 1: 
+                # sumbit placeholder_list to database
+                # TODO
+                # clear placeholder_list
+                placeholder_list = ['', '']
+                self.date.set(placeholder_list[0])
+                self.quantity.set(placeholder_list[1])
+
+                return placeholder_list
             elif len(placeholder_list[key1]) == 7:
                 calc_key1[0] = 1
                 return

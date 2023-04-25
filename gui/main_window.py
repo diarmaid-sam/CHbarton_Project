@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from ttkbootstrap.constants import *
 import ttkbootstrap as tb
+import ttkbootstrap.tableview as tbtable
 from ttkbootstrap.scrolled import ScrolledFrame
 from inventory_windows import AddItems
 
@@ -65,31 +66,95 @@ class DashBoard(tb.Frame):
 
 
         # right frame segments
-        self.rf_top = tb.LabelFrame(self.right_frame, text=' recently added ', border=2, height=300, width=400, padding=(5), bootstyle='warning')
+        self.rf_top = tb.LabelFrame(self.right_frame, text=' recently added ', border=2, padding=(5), bootstyle='warning')
         self.rf_top.grid(column=0, row=0, sticky='nsew', padx=4, pady=4)
         self.rf_top.rowconfigure(0, weight=1)
         self.rf_top.columnconfigure(0, weight=1)
         
         # this is a 'ScrolledFrame' meaning a vertical scrollbar enables the contents of the frame to be explored (the contents will not adjust to the height)
-        self.rf_rcntAdded = ScrolledFrame(self.rf_top, height=250, width=380, bootstyle='round')
+        self.rf_rcntAdded = ScrolledFrame(self.rf_top, bootstyle='round', autohide='true')
         self.rf_rcntAdded.grid(column=0, row=0, sticky='nsew')
+        self.rf_rcntAdded.rowconfigure(0, weight=1)
+        self.rf_rcntAdded.columnconfigure(0, weight=1)
 
 
-        self.rf_bottom = tb.LabelFrame(self.right_frame, text=' my section ',border=2, height=300, width=400, bootstyle='danger', padding=(4))
+        self.rf_bottom = tb.LabelFrame(self.right_frame, text=' my section ',border=2, bootstyle='danger', padding=(4))
         self.rf_bottom.grid(column=0, row=1, sticky='nsew')
-        self.rf_bottom.rowconfigure(1, weight=1)
+        self.rf_bottom.rowconfigure(0, weight=1)
         self.rf_bottom.columnconfigure(0, weight=1)
+        self.rf_bottom.rowconfigure(1, weight=10)
 
         self.selected_staff = tk.StringVar()
         self.selected_staff.set(staff[0])
         rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, *staff, bootstyle='danger-outline')
-        rf_selectUser.grid(column=0, row=0, padx=7, sticky='e')
+        rf_selectUser.grid(column=0, row=0, padx=7, sticky='ne')
+
+        # table frame for 'my section' section of the dashboard
+        self.my_section_table = tb.Frame(self.rf_bottom, border=2, relief='solid', padding=10)
+        self.my_section_table.grid(column=0, row=1, sticky='nsew')
+        temp_label = tb.Label(self.my_section_table, text="im a label")
+        temp_label.grid(column=0, row=0, sticky='nsew')
+
 
         self.grid()
 
 class Inventory(ttk.Frame):
     def __init__(self, container):
-        super().__init__(container, border=2, height=600, width=800, bootstyle="primary")
+        super().__init__(container, height=600, width=800, bootstyle="secondary")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+
+        # top frame for navigation of the inventory table
+        self.utility_frame = tb.Frame(self, border=2, relief='solid', bootstyle='secondary')
+        self.utility_frame.grid(column=0, row=0, sticky='new')
+        self.utility_frame.columnconfigure(0, weight=12)
+        self.utility_frame.columnconfigure(1, weight=4)
+        self.utility_frame.rowconfigure(0, weight=1)
+        
+        # search bar section of the  utility frame (contains search bar, sort by button and filter by button)
+        self.search_bar_frame = tb.Frame(self.utility_frame)
+        self.search_bar_frame.grid(column=0, row=0, sticky='nsew')
+        self.search_bar_frame.columnconfigure(0, weight=12)
+        self.search_bar_frame.columnconfigure(1, weight=3)
+        self.search_bar_frame.columnconfigure(2, weight=3)
+        # widgets (entry and buttons) for the search bar
+        search_entry = tb.Entry(self.search_bar_frame, bootstyle='secondary')
+        search_entry.grid(column=0, row=0, sticky='nsew')
+        sortBy_btn = tb.Button(self.search_bar_frame, text='sort by', bootstyle='secondary')
+        sortBy_btn.grid(column=1, row=0, sticky='nsew', padx=3, pady=5)
+        filterBy_btn = tb.Button(self.search_bar_frame, text='filter by', bootstyle='secondary')
+        filterBy_btn.grid(column=2, row=0, sticky='nsew', padx=2, pady=5)
+
+        # add item button of the utility frame
+        add_button = tb.Button(self.utility_frame, padding=10, text="Add", command=lambda:AddItems(self), bootstyle='success')
+        add_button.grid(column=1, row=0, sticky='nsew', padx=(10))
+
+        # table of entire shop_inventory.db
+        coldata = [
+                    "Product Name", 
+                   {"text": "expiry date", "stretch": "false"}, 
+                   {"text": "quantity", "stretch": "false"},
+                   {"text": "user section", "stretch": "false"},
+                   {"text": "time added", "stretch": "false"}
+                   ]
+        
+        rowdata = [
+            ('A123', 'IzzyCo', 12, 'delta', 'dieeye'),
+            ('A136', 'Kimdee Inc.', 45, 'delta', 'dieeye'),
+            ('A158', 'Farmadding Co.', 36, 'delta', 'dieeye'),
+            ('A123', 'IzzyCo', 12, 'delta', 'dieeye'),
+            ('A136', 'Kimdee Inc.', 45, 'delta', 'dieeye'),
+            ('A158', 'Farmadding Co.', 36, 'delta', 'dieeye')
+        ]
+        self.inventory_table = tbtable.Tableview(master=self,
+                                                 coldata=coldata,
+                                                 rowdata=rowdata,
+                                                 stripecolor=('black', 'white')
+                                                      )
+        self.inventory_table.grid(column=0, row=1, sticky='nsew')
+
+
+
 
         self.grid()
 
