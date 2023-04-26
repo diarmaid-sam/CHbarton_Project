@@ -20,35 +20,101 @@ class DashBoard(tb.Frame):
         # left frame structure of Dashboard
         self.left_frame = tb.Frame(self, border=2, height=700, width=400)
         self.left_frame.grid(column=0, row=0, sticky='nsew')
-        self.left_frame.rowconfigure(0, weight=2)
+        self.left_frame.rowconfigure(0, weight=1)
+        self.left_frame.rowconfigure(1, weight=1)
         self.left_frame.columnconfigure(0, weight=1)
-        self.left_frame.columnconfigure(1, weight=1)
         # left frame segments + their structure
-        self.lf_top_left = tb.Frame(self.left_frame, border=2, height=400, width=200)
-        self.lf_top_left.grid(column=0, row=0, sticky='nsew')
-        self.lf_top_left.rowconfigure(0, weight=1)
-        self.lf_top_left.rowconfigure(1, weight=1)
-        self.lf_top_left.rowconfigure(2, weight=1)
+        self.lf_top = tb.Frame(self.left_frame, relief='solid')
+        self.lf_top.grid(column=0, row=0, sticky='nsew')
+        self.lf_top.rowconfigure(1, weight=1)
+        self.lf_top.columnconfigure(0, weight=1)
 
-        # top left segment with the 3 meters.
-        meter_total = tb.Meter(self.lf_top_left, subtext="items", metersize=150, metertype='semi', wedgesize=40).grid(column=0, row=0, sticky='nsew')
-        meter_amber = tb.Meter(self.lf_top_left, subtext="short-dated", metersize=150, metertype='semi', wedgesize= 50).grid(column=0, row=1, sticky='nsew')
-        meter_red = tb.Meter(self.lf_top_left, subtext="expired", metersize=150, metertype='semi', wedgesize=10).grid(column=0, row=2, sticky='nsew')
 
-        self.lf_top_right = tb.LabelFrame(self.left_frame, text=' shop status ',border=2, height=400, width=200, bootstyle='success')
-        self.lf_top_right.grid(column=1, row=0, sticky='nsew', padx=4, pady=4)
+        # widgets of left frame, top window
+        shop_status_label = tb.Label(self.lf_top, text="s h o p  s t a t u s", padding=10, bootstyle='light')
+        shop_status_label.grid(column=0, row=0, sticky='n')
 
-        # top right segment of left frame (shop overview)
+        # shop label font config:
+        my_font = tkfont.Font(shop_status_label, shop_status_label.cget("font"))
+        my_font.configure(underline=True)
+        my_font.configure(size=(20))
+
+        shop_status_label.config(font=my_font)
+
+        # shop progress bar frame 
+        self.shop_status = tb.Frame(self.lf_top, padding=10, relief='raised')
+        self.shop_status.grid(column=0, row=1, sticky='nsew', padx=10, pady=(0, 5))
+        self.shop_status.rowconfigure(0, weight=1)
+
+
+        # create a progress bar and align vertically
+        total_items_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='success')
+        total_items_pb['value'] = 100
+        total_items_pb.grid(column=0, row=0, sticky='ns', padx=(0, 12))
+
+        items_shortdated_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='warning')
+        items_shortdated_pb['value'] = 50
+        items_shortdated_pb.grid(column=1, row=0, sticky='ns', padx=(0, 12))
+
+        items_expired_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='danger')
+        items_expired_pb['value'] = 25
+        items_expired_pb.grid(column=2, row=0, sticky='ns', padx=(0, 12))
+
+
+        # frame to hold labels for the shop status
+        self.shop_stat_label_frame = tb.Frame(self.shop_status, padding=5, relief='solid')
+        self.shop_stat_label_frame.grid(column=3, row=0, sticky='nsew')
         
+        # title label for the status of the shop
+        top_label_shop_status = tb.Label(self.shop_stat_label_frame, text="s t a t s :", padding=10, relief='groove')
+        top_label_shop_status.grid(column=0, row=0, sticky='n', columnspan=2)
+
+        # variables to keep track of the actual value of total items, total items that are short-dated, and total expired items
+        # TODO query database to get realtime data for these labels
+        self.total_items = tk.StringVar(value="4")
+        self.total_shortdated = tk.StringVar(value="2")
+        self.total_expired = tk.StringVar(value="1")
+
+        total_items_label = tb.Label(self.shop_stat_label_frame, text=("ITEMS TOTAL: "), padding=10)
+        total_items_label.grid(column=0, row=1, sticky='ne')
+        total_items_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_items, bootstyle="success")
+        total_items_label_var.grid(column=1, row=1, sticky='w')
+
+        total_items_label.config(font=(10))
+        total_items_label_var.config(font=(10))
+
+        total_shortdated_label = tb.Label(self.shop_stat_label_frame, text=("SHORTDATED TOTAL: "), padding=10)
+        total_shortdated_label.grid(column=0, row=2, sticky='ne')
+        total_shortdated_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_shortdated, bootstyle="warning")
+        total_shortdated_label_var.grid(column=1, row=2, sticky='w')
+
+        total_shortdated_label.config(font=(10))
+        total_shortdated_label_var.config(font=(10))
+
+        total_expired_label = tb.Label(self.shop_stat_label_frame, text=("SHORTDATED TOTAL: "), padding=10)
+        total_expired_label.grid(column=0, row=3, sticky='ne')
+        total_expired_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_expired, bootstyle="danger")
+        total_expired_label_var.grid(column=1, row=3, sticky='w')
+
+        total_expired_label.config(font=(10))
+        total_expired_label_var.config(font=(10))
         
-        # bottom segment of left frame
-        self.lf_bottom = tb.Frame(self.left_frame, border=2, height=200, width=400)
-        self.lf_bottom.grid(column=0, row=1, sticky='nsew', columnspan=2)
+
+        
+
+
+        
+
+        self.lf_bottom = tb.Frame(self.left_frame, relief='solid')
+        self.lf_bottom.grid(column=0, row=1, sticky='nsew')
         self.lf_bottom.rowconfigure(1, weight=4)
         self.lf_bottom.columnconfigure(0, weight=1)
         self.lf_bottom.columnconfigure(1, weight=1)
         self.lf_bottom.columnconfigure(2, weight=1)
-
+        # top right segment of left frame (shop overview)
+        
+        
+        
 
         # structure of bottom segement of left frame (manage Inventory buttons)
         lf_bottom_title = tb.Label(self.lf_bottom, text="Manage Inventory", anchor='center').grid(column=1, row=0, sticky='ew')
@@ -138,7 +204,7 @@ class Inventory(ttk.Frame):
         # table of entire shop_inventory.db
         # column headers for table
         coldata = [
-                    "Product Name", 
+                   {"text": "Product name", "stretch": "false"}, 
                    {"text": "expiry date", "stretch": "false"}, 
                    {"text": "quantity", "stretch": "false"},
                    {"text": "user section", "stretch": "false"},
@@ -162,26 +228,14 @@ class Inventory(ttk.Frame):
                                                       )
         self.inventory_table.grid(column=0, row=1, sticky='nsew')
 
-
-
-
-        self.grid()
-
-class Button1(ttk.Frame):
-    def __init__(self, container):
-        super().__init__(container, border=2, height=600, width=800, bootstyle="primary")
-
-        self.grid()
-
-class Button2(ttk.Frame):
-    def __init__(self, container):
-        super().__init__(container, border=2, height=600, width=800, bootstyle="primary")
-
         self.grid()
 
 class Users(ttk.Frame):
     def __init__(self, container):
         super().__init__(container, border=2, height=600, width=800, bootstyle="primary")
+
+        user1 = tb.Notebook(self, height=400, width=400)
+        user1.grid(column=0, row=0, sticky='nsew')
 
         self.grid()
 
@@ -198,7 +252,7 @@ class MainFrame(tb.Frame):
 
         self.frames = {} 
 
-        for F in (DashBoard, Inventory, Button1, Button2, Users, History):
+        for F in (DashBoard, Inventory, Users, History):
             frame = F(self)
             self.frames[F] = frame
             frame.grid(row=1, column=0, sticky='nsew')
@@ -215,17 +269,14 @@ class MainFrame(tb.Frame):
         self.navBar.grid(column=0, row=0, sticky='ew')
         nav_dashboard = ttk.Button(self.navBar, text="Dashboard", padding=(15, 20), command=lambda:self.show_frame(DashBoard), bootstyle="outline").grid(column=0, row=0, sticky='ew')
         nav_inventory = ttk.Button(self.navBar, text="Inventory", padding=(15, 20), command=lambda:self.show_frame(Inventory), bootstyle="outline").grid(column=1, row=0, sticky='ew')
-        nav_button1 = ttk.Button(self.navBar, text="Button1", padding=(15, 20), command=lambda:self.show_frame(Button1), bootstyle="outline").grid(column=2, row=0, sticky='ew')
-        nav_button2 = ttk.Button(self.navBar, text="Button2", padding=(15, 20), command=lambda:self.show_frame(Button2), bootstyle="outline").grid(column=3, row=0, sticky='ew')
-        nav_users = ttk.Button(self.navBar, text="Users", padding=(15, 20), command=lambda:self.show_frame(Users), bootstyle="outline").grid(column=4, row=0, sticky='ew')
-        nav_history = ttk.Button(self.navBar, text="History", padding=(15, 20), command=lambda:self.show_frame(History), bootstyle="outline").grid(column=5, row=0, sticky='ew')
+        nav_users = ttk.Button(self.navBar, text="Users", padding=(15, 20), command=lambda:self.show_frame(Users), bootstyle="outline").grid(column=2, row=0, sticky='ew')
+        nav_history = ttk.Button(self.navBar, text="History", padding=(15, 20), command=lambda:self.show_frame(History), bootstyle="outline").grid(column=3, row=0, sticky='ew')
 
         self.navBar.columnconfigure(0, weight=1)
         self.navBar.columnconfigure(1, weight=1)
         self.navBar.columnconfigure(2, weight=1)
         self.navBar.columnconfigure(3, weight=1)
-        self.navBar.columnconfigure(4, weight=1)
-        self.navBar.columnconfigure(5, weight=1)
+
 
 if __name__ == "__main__":
     app = tb.Window("Software", themename="superhero", minsize=(800, 800))
