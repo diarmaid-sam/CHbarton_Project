@@ -24,7 +24,7 @@ class DashBoard(tb.Frame):
         self.left_frame.rowconfigure(1, weight=1)
         self.left_frame.columnconfigure(0, weight=1)
         # left frame segments + their structure
-        self.lf_top = tb.Frame(self.left_frame, relief='solid')
+        self.lf_top = tb.Frame(self.left_frame)
         self.lf_top.grid(column=0, row=0, sticky='nsew')
         self.lf_top.rowconfigure(1, weight=1)
         self.lf_top.columnconfigure(0, weight=1)
@@ -42,32 +42,10 @@ class DashBoard(tb.Frame):
         shop_status_label.config(font=my_font)
 
         # shop progress bar frame 
-        self.shop_status = tb.Frame(self.lf_top, padding=10, relief='raised')
+        self.shop_status = tb.Frame(self.lf_top, padding=10, relief='solid')
         self.shop_status.grid(column=0, row=1, sticky='nsew', padx=10, pady=(0, 5))
-        self.shop_status.rowconfigure(0, weight=1)
-
-
-        # create a progress bar and align vertically
-        total_items_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='success')
-        total_items_pb['value'] = 100
-        total_items_pb.grid(column=0, row=0, sticky='ns', padx=(0, 12))
-
-        items_shortdated_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='warning')
-        items_shortdated_pb['value'] = 50
-        items_shortdated_pb.grid(column=1, row=0, sticky='ns', padx=(0, 12))
-
-        items_expired_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='danger')
-        items_expired_pb['value'] = 25
-        items_expired_pb.grid(column=2, row=0, sticky='ns', padx=(0, 12))
-
-
-        # frame to hold labels for the shop status
-        self.shop_stat_label_frame = tb.Frame(self.shop_status, padding=5, relief='solid')
-        self.shop_stat_label_frame.grid(column=3, row=0, sticky='nsew')
-        
-        # title label for the status of the shop
-        top_label_shop_status = tb.Label(self.shop_stat_label_frame, text="s t a t s :", padding=10, relief='groove')
-        top_label_shop_status.grid(column=0, row=0, sticky='n', columnspan=2)
+        self.shop_status.rowconfigure(1, weight=1)
+        self.shop_status.columnconfigure(3, weight=1)
 
         # variables to keep track of the actual value of total items, total items that are short-dated, and total expired items
         # TODO query database to get realtime data for these labels
@@ -75,30 +53,67 @@ class DashBoard(tb.Frame):
         self.total_shortdated = tk.StringVar(value="2")
         self.total_expired = tk.StringVar(value="1")
 
-        total_items_label = tb.Label(self.shop_stat_label_frame, text=("ITEMS TOTAL: "), padding=10)
-        total_items_label.grid(column=0, row=1, sticky='ne')
-        total_items_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_items, bootstyle="success")
-        total_items_label_var.grid(column=1, row=1, sticky='w')
+        # create a progress bar and align vertically
+        total_items_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='success')
+        total_items_pb['value'] = ((int(self.total_items.get())-(int(self.total_shortdated.get())+int(self.total_expired.get())))/int(self.total_items.get())*100)
+        total_items_pb.grid(column=0, row=0, sticky='ns', padx=(0, 12), rowspan=2)
 
-        total_items_label.config(font=(10))
-        total_items_label_var.config(font=(10))
+        items_shortdated_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='warning')
+        items_shortdated_pb['value'] = ((int(self.total_shortdated.get())/int(self.total_items.get()))*100)
+        items_shortdated_pb.grid(column=1, row=0, sticky='ns', padx=(0, 12), rowspan=2)
+
+        items_expired_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='danger')
+        items_expired_pb['value'] = ((int(self.total_expired.get())/int(self.total_items.get()))*100)
+        items_expired_pb.grid(column=2, row=0, sticky='ns', padx=(0, 12), rowspan=2)
+
+
+        # frame to hold labels for the shop status
+        self.shop_stat_label_frame = tb.Frame(self.shop_status, padding=5, relief='solid')
+        self.shop_stat_label_frame.grid(column=3, row=1, sticky='new')
+        # column 2 gets weight=1 so that buttons can be placed at rhs of text
+        self.shop_stat_label_frame.columnconfigure(2, weight=1)
+        
+        
+        # title label for the status of the shop
+        top_label_shop_status = tb.Label(self.shop_status, text="s t a t s :", padding=10)
+        top_label_shop_status.grid(column=3, row=0, sticky='nw')
+        top_label_shop_status.config(font=('default', 15))
+
+         
+
+        total_items_label = tb.Label(self.shop_stat_label_frame, text=("ITEMS TOTAL: "), padding=10)
+        total_items_label.grid(column=0, row=1, sticky='nsew')
+        total_items_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_items, bootstyle="success")
+        total_items_label_var.grid(column=1, row=1, sticky='nsew')
+
+        total_items_label.config(font=("default", 13))
+        total_items_label_var.config(font=("default", 15))
 
         total_shortdated_label = tb.Label(self.shop_stat_label_frame, text=("SHORTDATED TOTAL: "), padding=10)
-        total_shortdated_label.grid(column=0, row=2, sticky='ne')
+        total_shortdated_label.grid(column=0, row=2, sticky='nsew')
         total_shortdated_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_shortdated, bootstyle="warning")
-        total_shortdated_label_var.grid(column=1, row=2, sticky='w')
+        total_shortdated_label_var.grid(column=1, row=2, sticky='nsew')
 
-        total_shortdated_label.config(font=(10))
-        total_shortdated_label_var.config(font=(10))
+        total_shortdated_label.config(font=("default", 13))
+        total_shortdated_label_var.config(font=("default", 15))
 
-        total_expired_label = tb.Label(self.shop_stat_label_frame, text=("SHORTDATED TOTAL: "), padding=10)
-        total_expired_label.grid(column=0, row=3, sticky='ne')
+        total_expired_label = tb.Label(self.shop_stat_label_frame, text=("EXPIRED TOTAL: "), padding=10)
+        total_expired_label.grid(column=0, row=3, sticky='nsew')
         total_expired_label_var = tb.Label(self.shop_stat_label_frame, textvariable=self.total_expired, bootstyle="danger")
-        total_expired_label_var.grid(column=1, row=3, sticky='w')
+        total_expired_label_var.grid(column=1, row=3, sticky='nsew')
 
-        total_expired_label.config(font=(10))
-        total_expired_label_var.config(font=(10))
-        
+        total_expired_label.config(font=("default", 13))
+        total_expired_label_var.config(font=("default", 15))
+
+        # inspect buttons for expired and shortdated items
+        # TODO make functional
+
+        shortdate_inspect_btn = tb.Button(self.shop_stat_label_frame, text='inspect', padding=3, bootstyle='outline-secondary')
+        shortdate_inspect_btn.grid(column=2, row=2, sticky='e', padx=(0, 10))
+
+    
+        expired_inspect_btn = tb.Button(self.shop_stat_label_frame, text='inspect', padding=3, bootstyle='outline-secondary')
+        expired_inspect_btn.grid(column=2, row=3, sticky='e', padx=(0, 10))
 
         
 
