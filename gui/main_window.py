@@ -270,6 +270,8 @@ class Users(ttk.Frame):
         self.user_rf = tb.Frame(self, relief='solid')
         self.user_rf.grid(column=1, row=0, sticky='nsew', padx=5, pady=5)
 
+        ### LEFT FRAME  STRUCTURE ###
+
         # left frame structure
         lf_title_label = tb.Label(self.user_lf, text="U S E R S", padding=10, bootstyle='light')
         lf_title_label.grid(column=0, row=0, sticky='new', padx=5, pady=5)
@@ -289,7 +291,7 @@ class Users(ttk.Frame):
 
         # manage_users_frame widgets
         # TODO make these buttons functional (create toplevel window)
-        add_user_button = tb.Button(self.manage_users_frame, text='add users', padding=(0, 10), bootstyle='outline-dark')
+        add_user_button = tb.Button(self.manage_users_frame, text='add users', padding=(0, 10), bootstyle='outline-success')
         add_user_button.grid(column=0, row=0, sticky='nsew', padx=5, pady=5)
         edit_user_button = tb.Button(self.manage_users_frame, text='edit users', padding=(0, 10), bootstyle='outline')
         edit_user_button.grid(column=1, row=0, sticky='nsew', padx=(0, 5), pady=5)
@@ -301,16 +303,47 @@ class Users(ttk.Frame):
         self.user_list_frame.grid(column=0, row=2, sticky='nsew', padx=5, pady=5)
         self.user_list_frame.columnconfigure(0, weight=1)
 
-        # counter used to place buttons on separate rows
-        x = 0
-        for user in staff:
+        notebooks = []
+        for i, user in enumerate(staff):
+            ## TEMP CODE - when we start to query database, 'User' wont exist ##
             if user == 'User':
                 continue
-            user_button = tb.Button(self.user_list_frame, text=user, padding=(0, 5), bootstyle='outline-primary')
-            user_button.grid(column=0, row=x, sticky='nsew', padx=5, pady=10)
-            self.user_list_frame.rowconfigure(x, weight=1)
-            x += 1
-        
+            ## TEMP CODE ##
+
+            #creating right frame notebooks 
+            notebook = tb.Notebook(self.user_rf)
+
+            frame1 = tb.Frame(notebook, bootstyle='primary')
+            frame1.grid(column=0, row=0, sticky='nsew')
+            notebook.add(frame1, text=user)
+
+            frame2 = tb.Frame(notebook, bootstyle='secondary')
+            frame2.grid(column=0, row=0, sticky='nsew')
+            notebook.add(frame2, text='my items')
+
+            notebook.grid(column=0, row=0, sticky='nsew')
+            notebooks.append(notebook)
+            
+
+
+            ## CONSTRUCT LEFT FRAME BUTTONS
+            user_button = tb.Button(self.user_list_frame, text=user, padding=(0, 5), bootstyle='outline-primary', command=lambda: notebooks[i].select().grid())
+            user_button.grid(column=0, row=i, sticky='nsew', padx=5, pady=10)
+            self.user_list_frame.rowconfigure(i, weight=1)
+
+            ## CONSTRUCT RIGHT FRAME NOTEBOOKS
+
+
+            
+
+
+
+
+            ##
+
+        ### RIGHT FRAME STRUCTURE ###
+
+
 
 
 
@@ -327,8 +360,10 @@ class History(ttk.Frame):
 class MainFrame(tb.Frame):
     def __init__(self, master_Window):
         super().__init__(master_Window, padding=(10), relief="solid", width=800, height=800)
+
         self.__navBar()
 
+        # swapping frame mechanism for navbar
         self.frames = {} 
 
         for F in (DashBoard, Inventory, Users, History):
