@@ -9,6 +9,8 @@ from inventory_windows import AddItems
 
 staff = ['User', 'Cheryl', 'Sarah', 'Lauren', 'Nicola']
 
+# TODO design a function to show relevant table information associated with given staff member
+
 class DashBoard(tb.Frame):
     def __init__(self, container):
         
@@ -72,7 +74,7 @@ class DashBoard(tb.Frame):
 
 
         # frame to hold labels for the shop status
-        self.shop_stat_label_frame = tb.Frame(self.shop_status, padding=5, relief='solid')
+        self.shop_stat_label_frame = tb.Frame(self.shop_status, relief='solid')
         self.shop_stat_label_frame.grid(column=3, row=1, sticky='new')
         # column 2 gets weight=1 so that buttons can be placed at rhs of text
         self.shop_stat_label_frame.columnconfigure(2, weight=1)
@@ -171,6 +173,8 @@ class DashBoard(tb.Frame):
         self.rf_bottom.rowconfigure(1, weight=10)
 
         self.selected_staff = tk.StringVar()
+        # using self.selected_staff.get you can retrieve the currently selected user. This can then be used to show the relevant section information
+        # when passed into the function
         self.selected_staff.set(staff[0])
         rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, *staff, bootstyle='danger-outline')
         rf_selectUser.grid(column=0, row=0, padx=7, sticky='ne')
@@ -252,9 +256,65 @@ class Inventory(ttk.Frame):
 class Users(ttk.Frame):
     def __init__(self, container):
         super().__init__(container, border=2, height=600, width=800, bootstyle="primary")
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=3)
+        self.rowconfigure(0, weight=1)
 
-        user1 = tb.Notebook(self, height=400, width=400)
-        user1.grid(column=0, row=0, sticky='nsew')
+        # left and right frames of the mainframe (of users)
+        self.user_lf = tb.Frame(self, relief='solid')
+        self.user_lf.grid(column=0, row=0, sticky='nsew', padx=(5, 0), pady=5)
+
+        self.user_lf.rowconfigure(2, weight=1)
+        self.user_lf.columnconfigure(0, weight=1)
+
+        self.user_rf = tb.Frame(self, relief='solid')
+        self.user_rf.grid(column=1, row=0, sticky='nsew', padx=5, pady=5)
+
+        # left frame structure
+        lf_title_label = tb.Label(self.user_lf, text="U S E R S", padding=10, bootstyle='light')
+        lf_title_label.grid(column=0, row=0, sticky='new', padx=5, pady=5)
+
+        # styling the title label (underline)
+        lf_title_font = tkfont.Font(lf_title_label, lf_title_label.cget("font"))
+        lf_title_font.configure(size=(15))
+        lf_title_font.configure(underline=True)
+        lf_title_label.config(font=lf_title_font)
+        
+        # manage users frame and structure
+        self.manage_users_frame = tb.LabelFrame(self.user_lf, text=" manage users ", relief='solid')
+        self.manage_users_frame.grid(column=0, row=1, sticky='new')
+        self.manage_users_frame.columnconfigure(0, weight=1)
+        self.manage_users_frame.columnconfigure(1, weight=1)
+        self.manage_users_frame.columnconfigure(2, weight=1)
+
+        # manage_users_frame widgets
+        # TODO make these buttons functional (create toplevel window)
+        add_user_button = tb.Button(self.manage_users_frame, text='add users', padding=(0, 10), bootstyle='outline-dark')
+        add_user_button.grid(column=0, row=0, sticky='nsew', padx=5, pady=5)
+        edit_user_button = tb.Button(self.manage_users_frame, text='edit users', padding=(0, 10), bootstyle='outline')
+        edit_user_button.grid(column=1, row=0, sticky='nsew', padx=(0, 5), pady=5)
+        remove_user_button = tb.Button(self.manage_users_frame, text='remove users', padding=(0, 10), bootstyle='outline-danger')
+        remove_user_button.grid(column=2, row=0, sticky='nsew', padx=(0, 5), pady=5)
+
+        # new frame for user associated buttons (variable number)
+        self.user_list_frame = tb.Frame(self.user_lf, borderwidth=30, relief='solid')
+        self.user_list_frame.grid(column=0, row=2, sticky='nsew', padx=5, pady=5)
+        self.user_list_frame.columnconfigure(0, weight=1)
+
+        # counter used to place buttons on separate rows
+        x = 0
+        for user in staff:
+            if user == 'User':
+                continue
+            user_button = tb.Button(self.user_list_frame, text=user, padding=(0, 5), bootstyle='outline-primary')
+            user_button.grid(column=0, row=x, sticky='nsew', padx=5, pady=10)
+            self.user_list_frame.rowconfigure(x, weight=1)
+            x += 1
+        
+
+
+
+
 
         self.grid()
 
