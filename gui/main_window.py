@@ -5,7 +5,7 @@ from ttkbootstrap.constants import *
 import ttkbootstrap as tb
 import ttkbootstrap.tableview as tbtable
 from ttkbootstrap.scrolled import ScrolledFrame
-from toplevel_windows import AddItems
+from toplevel_windows import *
 
 staff = ['Cheryl', 'Sarah', 'Lauren', 'Nicola']
 
@@ -297,7 +297,7 @@ class Users(ttk.Frame):
 
         # manage_users_frame widgets
         # TODO make these buttons functional (create toplevel window)
-        add_user_button = tb.Button(self.manage_users_frame, text='add users', padding=(0, 10), bootstyle='outline-success')
+        add_user_button = tb.Button(self.manage_users_frame, text='add users', padding=(0, 10), bootstyle='outline-success', command= lambda:AddUser(self))
         add_user_button.grid(column=0, row=0, sticky='nsew', padx=5, pady=5)
         edit_user_button = tb.Button(self.manage_users_frame, text='edit users', padding=(0, 10), bootstyle='outline')
         edit_user_button.grid(column=1, row=0, sticky='nsew', padx=(0, 5), pady=5)

@@ -16,19 +16,19 @@ if len(table_exists) == 0:
 
     # product id here in products will be the barcode that is generated (that's the plan at least)
     c.execute("""CREATE TABLE users (
-    user_id INTEGER NOT NULL PRIMARY KEY,
+    user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL
     );""")
 
     c.execute("""CREATE TABLE products (
-    product_id INTEGER PRIMARY KEY,
+    product_id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_name TEXT NOT NULL,
     user_id  INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (user_id)    
     );""")
 
     c.execute("""CREATE TABLE inventory (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     expiry_date_month INTEGER NOT NULL,
     expiry_date_year INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
