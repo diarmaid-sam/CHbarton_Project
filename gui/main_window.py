@@ -5,11 +5,14 @@ from ttkbootstrap.constants import *
 import ttkbootstrap as tb
 import ttkbootstrap.tableview as tbtable
 from ttkbootstrap.scrolled import ScrolledFrame
-from inventory_windows import AddItems
+from toplevel_windows import AddItems
 
 staff = ['Cheryl', 'Sarah', 'Lauren', 'Nicola']
 
 # TODO design a function to show relevant table information associated with given staff member
+
+def get_table_data(**kwargs):
+    return
 
 class DashBoard(tb.Frame):
     def __init__(self, container):
@@ -255,20 +258,23 @@ class Inventory(ttk.Frame):
 
 class Users(ttk.Frame):
     def __init__(self, container):
-        super().__init__(container, border=2, height=600, width=800, bootstyle="primary")
+        super().__init__(container, border=2, height=600, width=800)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=3)
         self.rowconfigure(0, weight=1)
 
         # left and right frames of the mainframe (of users)
-        self.user_lf = tb.Frame(self, relief='solid')
+        self.user_lf = tb.Frame(self)
         self.user_lf.grid(column=0, row=0, sticky='nsew', padx=(5, 0), pady=5)
 
         self.user_lf.rowconfigure(2, weight=1)
         self.user_lf.columnconfigure(0, weight=1)
 
-        self.user_rf = tb.Frame(self, relief='solid')
+        self.user_rf = tb.Frame(self, borderwidth=5)
         self.user_rf.grid(column=1, row=0, sticky='nsew', padx=5, pady=5)
+
+        self.user_rf.columnconfigure(0, weight=1)
+        self.user_rf.rowconfigure(0, weight=1)
 
         ### LEFT FRAME  STRUCTURE ###
 
@@ -283,7 +289,7 @@ class Users(ttk.Frame):
         lf_title_label.config(font=lf_title_font)
         
         # manage users frame and structure
-        self.manage_users_frame = tb.LabelFrame(self.user_lf, text=" manage users ", relief='solid')
+        self.manage_users_frame = tb.LabelFrame(self.user_lf, text=" manage users ", relief='solid', bootstyle='primary', padding=(0, 0, 0, 5))
         self.manage_users_frame.grid(column=0, row=1, sticky='new')
         self.manage_users_frame.columnconfigure(0, weight=1)
         self.manage_users_frame.columnconfigure(1, weight=1)
@@ -309,14 +315,24 @@ class Users(ttk.Frame):
 
             #creating right frame notebooks 
             notebook = tb.Notebook(self.user_rf)
+            
 
-            frame1 = tb.Frame(notebook, bootstyle='primary')
+            frame1 = tb.Frame(notebook, bootstyle='dark')
             frame1.grid(column=0, row=0, sticky='nsew')
-            notebook.add(frame1, text=user)
+            frame1.columnconfigure(0, weight=1)
+            frame1.rowconfigure(0, weight=1)
+            user_section_table = tbtable.Tableview(master=frame1, searchable='true')
+            user_section_table.grid(column=0, row=0, sticky='nsew')
+            notebook.add(frame1, text=user + "'s section")
 
-            frame2 = tb.Frame(notebook, bootstyle='secondary')
+            frame2 = tb.Frame(notebook, bootstyle='light')
             frame2.grid(column=0, row=0, sticky='nsew')
-            notebook.add(frame2, text='my items')
+            frame2.columnconfigure(0, weight=1)
+            frame2.rowconfigure(0, weight=1)
+            user_items_table = tbtable.Tableview(master=frame2, searchable='true')
+            user_items_table.grid(column=0, row=0, sticky='nsew')
+
+            notebook.add(frame2, text=user + "'s items")
 
             notebook.grid(column=0, row=0, sticky='nsew')
             notebooks.append(notebook)
@@ -331,8 +347,8 @@ class Users(ttk.Frame):
             ## CONSTRUCT RIGHT FRAME NOTEBOOKS
 
 
-            
-
+        
+        
 
 
 

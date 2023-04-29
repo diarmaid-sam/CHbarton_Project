@@ -29,7 +29,8 @@ if len(table_exists) == 0:
 
     c.execute("""CREATE TABLE inventory (
     id INTEGER PRIMARY KEY,
-    expiry_date TEXT NOT NULL,
+    expiry_date_month INTEGER NOT NULL,
+    expiry_date_year INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     date_added TEXT NOT NULL,
     product_id INTEGER NOT NULL,
