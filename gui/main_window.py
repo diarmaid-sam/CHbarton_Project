@@ -7,7 +7,7 @@ import ttkbootstrap.tableview as tbtable
 from ttkbootstrap.scrolled import ScrolledFrame
 from inventory_windows import AddItems
 
-staff = ['User', 'Cheryl', 'Sarah', 'Lauren', 'Nicola']
+staff = ['Cheryl', 'Sarah', 'Lauren', 'Nicola']
 
 # TODO design a function to show relevant table information associated with given staff member
 
@@ -305,10 +305,7 @@ class Users(ttk.Frame):
 
         notebooks = []
         for i, user in enumerate(staff):
-            ## TEMP CODE - when we start to query database, 'User' wont exist ##
-            if user == 'User':
-                continue
-            ## TEMP CODE ##
+            
 
             #creating right frame notebooks 
             notebook = tb.Notebook(self.user_rf)
@@ -327,7 +324,7 @@ class Users(ttk.Frame):
 
 
             ## CONSTRUCT LEFT FRAME BUTTONS
-            user_button = tb.Button(self.user_list_frame, text=user, padding=(0, 5), bootstyle='outline-primary', command=lambda: notebooks[i].select().grid())
+            user_button = tb.Button(self.user_list_frame, text=user, padding=(0, 5), bootstyle='outline-primary', command=lambda i=i: notebooks[i].tkraise())
             user_button.grid(column=0, row=i, sticky='nsew', padx=5, pady=10)
             self.user_list_frame.rowconfigure(i, weight=1)
 
