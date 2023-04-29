@@ -6,9 +6,16 @@ import ttkbootstrap as tb
 import ttkbootstrap.tableview as tbtable
 from ttkbootstrap.scrolled import ScrolledFrame
 from toplevel_windows import *
+import sqlite3
 
-staff = ['Cheryl', 'Sarah', 'Lauren', 'Nicola']
-
+# GETTING LIST OF REGISTERED STAFF FROM THE users table IN THE DB
+conn = sqlite3.connect("shop_inventory.db")
+c = conn.cursor()
+global users_list
+c.execute("""SELECT username FROM users;""")
+users_list = c.fetchall()
+c.close()
+print(users_list)
 # TODO design a function to show relevant table information associated with given staff member
 
 def get_table_data(**kwargs):
@@ -178,8 +185,8 @@ class DashBoard(tb.Frame):
         self.selected_staff = tk.StringVar()
         # using self.selected_staff.get you can retrieve the currently selected user. This can then be used to show the relevant section information
         # when passed into the function
-        self.selected_staff.set(staff[0])
-        rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, *staff, bootstyle='danger-outline')
+        self.selected_staff.set(users_list[0])
+        rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, *users_list, bootstyle='danger-outline')
         rf_selectUser.grid(column=0, row=0, padx=7, sticky='ne')
 
         # table frame for 'my section' section of the dashboard
@@ -310,7 +317,7 @@ class Users(ttk.Frame):
         self.user_list_frame.columnconfigure(0, weight=1)
 
         notebooks = []
-        for i, user in enumerate(staff):
+        for i, user in enumerate(users_list):
             
 
             #creating right frame notebooks 
@@ -323,7 +330,7 @@ class Users(ttk.Frame):
             frame1.rowconfigure(0, weight=1)
             user_section_table = tbtable.Tableview(master=frame1, searchable='true')
             user_section_table.grid(column=0, row=0, sticky='nsew')
-            notebook.add(frame1, text=user + "'s section")
+            notebook.add(frame1, text=user[0] + "'s section")
 
             frame2 = tb.Frame(notebook, bootstyle='light')
             frame2.grid(column=0, row=0, sticky='nsew')
@@ -332,7 +339,7 @@ class Users(ttk.Frame):
             user_items_table = tbtable.Tableview(master=frame2, searchable='true')
             user_items_table.grid(column=0, row=0, sticky='nsew')
 
-            notebook.add(frame2, text=user + "'s items")
+            notebook.add(frame2, text=user[0] + "'s items")
 
             notebook.grid(column=0, row=0, sticky='nsew')
             notebooks.append(notebook)
