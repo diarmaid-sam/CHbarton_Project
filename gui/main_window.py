@@ -9,14 +9,16 @@ from ttkbootstrap.scrolled import ScrolledFrame
 
 ## Personal modules
 from toplevel_windows import *
-from globals import *
+from db_queries import *
 
 
 
 # TODO design a function to show relevant table information associated with given staff member
 
-def get_table_data(**kwargs):
-    return
+### parameter guide: 
+## including_rows: pass as an array of strings of the column headers you want
+## condition: simply a string stating the conditions you wish for the query to be conducted
+
 
 class DashBoard(tb.Frame):
     def __init__(self, container):
@@ -127,10 +129,6 @@ class DashBoard(tb.Frame):
     
         expired_inspect_btn = tb.Button(self.shop_stat_label_frame, text='inspect', padding=3, bootstyle='outline-secondary')
         expired_inspect_btn.grid(column=2, row=3, sticky='e', padx=(0, 10))
-
-        
-
-
         
 
         self.lf_bottom = tb.Frame(self.left_frame, relief='solid')
@@ -140,9 +138,6 @@ class DashBoard(tb.Frame):
         self.lf_bottom.columnconfigure(1, weight=1)
         # top right segment of left frame (shop overview)
         
-        
-        
-
         # structure of bottom segement of left frame (manage Inventory buttons)
         lf_bottom_title = tb.Label(self.lf_bottom, text="Manage Inventory", anchor='center').grid(column=0, row=0, sticky='ew', columnspan=2)
         lf_rmvItem = tb.Button(self.lf_bottom, text='-').grid(column=0, row=1, sticky='nsew', padx=30, pady=30)
