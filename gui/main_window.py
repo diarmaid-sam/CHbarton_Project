@@ -1,3 +1,4 @@
+## Tkinter and tkinter-styling related Modules
 import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import ttk
@@ -5,17 +6,13 @@ from ttkbootstrap.constants import *
 import ttkbootstrap as tb
 import ttkbootstrap.tableview as tbtable
 from ttkbootstrap.scrolled import ScrolledFrame
-from toplevel_windows import *
-import sqlite3
 
-# GETTING LIST OF REGISTERED STAFF FROM THE users table IN THE DB
-conn = sqlite3.connect("shop_inventory.db")
-c = conn.cursor()
-global users_list
-c.execute("""SELECT username FROM users;""")
-users_list = c.fetchall()
-c.close()
-print(users_list)
+## Personal modules
+from toplevel_windows import *
+from globals import *
+
+
+
 # TODO design a function to show relevant table information associated with given staff member
 
 def get_table_data(**kwargs):
@@ -308,7 +305,7 @@ class Users(ttk.Frame):
         add_user_button.grid(column=0, row=0, sticky='nsew', padx=5, pady=5)
         edit_user_button = tb.Button(self.manage_users_frame, text='edit users', padding=(0, 10), bootstyle='outline')
         edit_user_button.grid(column=1, row=0, sticky='nsew', padx=(0, 5), pady=5)
-        remove_user_button = tb.Button(self.manage_users_frame, text='remove users', padding=(0, 10), bootstyle='outline-danger')
+        remove_user_button = tb.Button(self.manage_users_frame, text='remove users', padding=(0, 10), bootstyle='outline-danger', command= lambda:DeleteUser(self))
         remove_user_button.grid(column=2, row=0, sticky='nsew', padx=(0, 5), pady=5)
 
         # new frame for user associated buttons (variable number)
@@ -353,7 +350,7 @@ class Users(ttk.Frame):
 
             ## CONSTRUCT RIGHT FRAME NOTEBOOKS
 
-
+        button1221 = tb.Button(self, text="refresh", command=lambda:app.update()).grid(column=0, row=0)
         
         
 
