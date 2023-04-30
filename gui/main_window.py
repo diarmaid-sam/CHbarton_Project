@@ -138,17 +138,15 @@ class DashBoard(tb.Frame):
         self.lf_bottom.rowconfigure(1, weight=4)
         self.lf_bottom.columnconfigure(0, weight=1)
         self.lf_bottom.columnconfigure(1, weight=1)
-        self.lf_bottom.columnconfigure(2, weight=1)
         # top right segment of left frame (shop overview)
         
         
         
 
         # structure of bottom segement of left frame (manage Inventory buttons)
-        lf_bottom_title = tb.Label(self.lf_bottom, text="Manage Inventory", anchor='center').grid(column=1, row=0, sticky='ew')
-        lf_rmvItem = tb.Button(self.lf_bottom, text='-').grid(column=0, row=1, sticky='nsew')
-        lf_Inspect = tb.Button(self.lf_bottom, text='Inspect').grid(column=1, row=1, sticky='nsew')
-        lf_addItem = tb.Button(self.lf_bottom, text='+', command=lambda:AddItems(self)).grid(column=2, row=1, sticky='nsew')
+        lf_bottom_title = tb.Label(self.lf_bottom, text="Manage Inventory", anchor='center').grid(column=0, row=0, sticky='ew', columnspan=2)
+        lf_rmvItem = tb.Button(self.lf_bottom, text='-').grid(column=0, row=1, sticky='nsew', padx=30, pady=30)
+        lf_addItem = tb.Button(self.lf_bottom, text='+', command=lambda:AddItems(self)).grid(column=1, row=1, sticky='nsew', padx=30, pady=30)
         self.bind("<Control-Return>", lambda event: lf_addItem.invoke())    
         
 
@@ -349,8 +347,7 @@ class Users(ttk.Frame):
             self.user_list_frame.rowconfigure(i, weight=1)
 
             ## CONSTRUCT RIGHT FRAME NOTEBOOKS
-
-        button1221 = tb.Button(self, text="refresh", command=lambda:app.update()).grid(column=0, row=0)
+        
         
         
 
