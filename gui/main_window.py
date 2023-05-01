@@ -174,8 +174,7 @@ class DashBoard(tb.Frame):
         self.selected_staff = tk.StringVar()
         # using self.selected_staff.get you can retrieve the currently selected user. This can then be used to show the relevant section information
         # when passed into the function
-        self.selected_staff.set(users_list[0])
-        rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, *users_list, bootstyle='danger-outline')
+        rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, 'user',*users_list, bootstyle='danger-outline')
         rf_selectUser.grid(column=0, row=0, padx=7, sticky='ne')
 
         # table frame for 'my section' section of the dashboard

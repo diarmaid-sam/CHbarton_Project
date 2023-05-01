@@ -57,13 +57,13 @@ class AddItems(tb.Toplevel):
         self.unknown_frame.columnconfigure(0, weight=1)
         self.unknown_frame.rowconfigure(2, weight=1)
 
-        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10))
+        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self))
         new_item_btn.grid(column=0, row=0, pady=10)
         search_label = tb.Label(self.unknown_frame, text='or Search existing items')
         search_label.grid(column=0, row=1, sticky='new', pady=(0, 10))
         search_label.config(anchor='center', font=('Arial', 14))
 
-        table = get_table_data(['users.user_id', 'product_name'], condition=None, make_table=True, master=self.unknown_frame, searchable=True)
+        table = get_table_data(['users.user_id', 'product_name'], condition=None, query_type='all' ,make_table=True, master=self.unknown_frame, searchable=True)
         table.grid(column=0, row=2, sticky='nsew', padx=10, pady=5)
         
 
@@ -186,6 +186,61 @@ class AddItems(tb.Toplevel):
         addMore = tb.Button(self.buttons, text="Add More", padding=(20, 15), bootstyle="outline-success").grid(column=0, row=0, sticky='sew')
         endSession = tb.Button(self.buttons, text="Done", padding=(20, 15), bootstyle="outline-warning", command=lambda: self.destroy()).grid(column=0, row=1, sticky='new', pady=(15, 0))
 
+class ItemDetails(tb.Toplevel):
+    def __init__(self, master, themename="superhero"):
+        super().__init__(title="Register Item", size=(600, 450))
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure((1, 2), weight=1)
+        # TODO query table where it's like 'get row data where BARCODE = ONE SCANNED'
+        ## of course if there isn't an equivalent barcode within the db, then leave it unfilled
+
+        ## top bar Menu for navigating between editor and view
+        self.main_btn_frame = tb.Frame(self, relief='raised', borderwidth=10)
+        self.main_btn_frame.grid(column=0, row=0, sticky='nsew')
+        self.main_btn_frame.columnconfigure((0, 1), weight=1)
+        self.main_btn_frame.rowconfigure(0, weight=1)
+
+        edit_btn = tb.Radiobutton(self.main_btn_frame, text='Edit Item', bootstyle='warning-toolbutton', width=20)
+        edit_btn.grid(column=0, row=0, sticky='e', padx=(0, 3))
+
+        finish_btn = tb.Button(self.main_btn_frame, text="Enter", width=20, bootstyle='success')
+        finish_btn.grid(column=1, row=0, sticky='w', padx=(3, 0))
+
+
+        ## edit details (entry box) frame
+        self.edit_details_frame = tb.Frame(self, relief='solid', borderwidth=10)
+        self.edit_details_frame.grid(column=0, row=1, sticky='nsew')
+        self.edit_details_frame.columnconfigure(1, weight=1)
+        self.edit_details_frame.rowconfigure((0, 1), weight=1)
+
+        itemname_label = tb.Label(self.edit_details_frame, text="Name:")
+        itemname_label.grid(column=0, row=0, sticky='e', padx=(0,5))
+        itemname_label.config(font=('Arial', 14))
+        itemname_entry = tb.Entry(self.edit_details_frame)
+        itemname_entry.grid(column=1, row=0, sticky='ew', padx=20)
+        
+        itemuser_label = tb.Label(self.edit_details_frame, text='Section:')
+        itemuser_label.grid(column=0, row=1, sticky='e')
+        itemuser_label.config(font=('Arial', 14))
+        users = get_table_data(['username'], None, 'users', False)
+        selected_user = StringVar()
+        itemuser_entry = tb.OptionMenu(self.edit_details_frame, selected_user, "select a user", *users, direction='below')
+        itemuser_entry.grid(column=1, row=1, sticky='ew', padx=20)
+    
+        self.item_stats_frame = tb.Frame(self, bootstyle='warning')
+        self.item_stats_frame.grid(column=0, row=2, sticky='nsew')
+        self.item_stats_frame.columnconfigure((0, 1), weight=1)
+        self.item_stats_frame.rowconfigure(0, weight=1)
+
+        placeholder1 = tb.Label(self.item_stats_frame, padding=50, background='red')
+        placeholder1.grid(column=0, row=0, sticky='nsew')
+        placeholder2 = tb.Label(self.item_stats_frame, padding=50, background='blue')
+        placeholder2.grid(column=1, row=0, sticky='nsew')
+        
+
+        
+
+
 class AddUser(tb.Toplevel):
     def __init__(self, master, themename='superhero'):
         super().__init__(title='Add User', size=(400, 200), resizable=(False, False))
@@ -212,7 +267,7 @@ class AddUser(tb.Toplevel):
         conn = sqlite3.connect('shop_inventory.db')
         c = conn.cursor()
         # insert into users table the new name of the new user.
-        c.execute(" INSERT INTO users (username) VALUES ?", self.username_entry.get())
+        c.execute("INSERT INTO users (username) VALUES (?)", (self.username_entry.get(),))
         
         conn.commit()
         c.close()
