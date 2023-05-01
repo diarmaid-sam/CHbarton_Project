@@ -131,17 +131,16 @@ class DashBoard(tb.Frame):
         expired_inspect_btn.grid(column=2, row=3, sticky='e', padx=(0, 10))
         
 
-        self.lf_bottom = tb.Frame(self.left_frame, relief='solid')
+        self.lf_bottom = tb.LabelFrame(self.left_frame, text=' manage inventory ',relief='solid', bootstyle="info")
         self.lf_bottom.grid(column=0, row=1, sticky='nsew')
-        self.lf_bottom.rowconfigure(1, weight=4)
+        self.lf_bottom.rowconfigure(0, weight=1)
         self.lf_bottom.columnconfigure(0, weight=1)
         self.lf_bottom.columnconfigure(1, weight=1)
         # top right segment of left frame (shop overview)
         
         # structure of bottom segement of left frame (manage Inventory buttons)
-        lf_bottom_title = tb.Label(self.lf_bottom, text="Manage Inventory", anchor='center').grid(column=0, row=0, sticky='ew', columnspan=2)
-        lf_rmvItem = tb.Button(self.lf_bottom, text='-').grid(column=0, row=1, sticky='nsew', padx=30, pady=30)
-        lf_addItem = tb.Button(self.lf_bottom, text='+', command=lambda:AddItems(self)).grid(column=1, row=1, sticky='nsew', padx=30, pady=30)
+        lf_rmvItem = tb.Button(self.lf_bottom, text='-', padding=(30,20)).grid(column=0, row=0, padx=30, pady=30)
+        lf_addItem = tb.Button(self.lf_bottom, text='+', command=lambda:AddItems(self), padding=(30,20)).grid(column=1, row=0, padx=30, pady=30)
         self.bind("<Control-Return>", lambda event: lf_addItem.invoke())    
         
 
@@ -368,7 +367,7 @@ class History(ttk.Frame):
 
 class MainFrame(tb.Frame):
     def __init__(self, master_Window):
-        super().__init__(master_Window, padding=(10), relief="solid", width=800, height=800)
+        super().__init__(master_Window, padding=(10), width=800, height=800)
 
         self.__navBar()
 
