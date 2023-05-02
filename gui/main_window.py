@@ -402,4 +402,4 @@ class MainFrame(tb.Frame):
 if __name__ == "__main__":
     app = tb.Window("Software", themename="superhero", minsize=(800, 800))
     MainFrame(app)
-    app.mainloop()  
+    app.mainloop()      

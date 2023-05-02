@@ -25,7 +25,7 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
             query_structure = """SELECT {cols} FROM inventory 
             JOIN products ON inventory.product_id = products.product_id 
             JOIN users ON products.user_id = users.user_id
-            WHERE {cond};"""
+            {cond};"""
             query = query_structure.format(cols=", ".join(including_rows), cond=condition)
     ## enables individual tables to be queried
     else:
@@ -33,7 +33,7 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
             query_structure = """SELECT {cols} FROM {table};"""
             query = query_structure.format(cols=", ".join(including_rows), table=query_type)
         else:
-            query_structure = """SELECT {cols} FROM {table} WHERE {cond};"""
+            query_structure = """SELECT {cols} FROM {table} {cond};"""
             query = query_structure.format(cols=", ".join(including_rows), cond=condition, table=query_type)
 
 
@@ -53,7 +53,7 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
             colname = colname.replace("_", " ")
             colname = colname.replace("users.", "")
             colname = colname.replace("products.", "")
-            colname = colname.replace("invenory.", "")
+            colname = colname.replace("inventory.", "")
             dict_entry['text'] = colname
             coldata.append(dict_entry)
 

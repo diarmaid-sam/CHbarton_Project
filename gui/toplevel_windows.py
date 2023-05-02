@@ -3,9 +3,11 @@ from tkinter import Tk
 from tkinter import ttk
 import ttkbootstrap as tb
 import sqlite3
+import datetime
 
 from button_mappings import calc_layout
 from db_queries import *
+
 
 # what is necessary:
 # scan item - If the barcode is registered in the database, then the fields are automatically filled. If the barcode isn't registered, then the 'register product' comes up.
@@ -236,12 +238,25 @@ class ItemDetails(tb.Toplevel):
         self.item_stats_frame = tb.Frame(self, bootstyle='warning')
         self.item_stats_frame.grid(column=0, row=2, sticky='nsew')
         self.item_stats_frame.columnconfigure((0, 1), weight=1)
-        self.item_stats_frame.rowconfigure(0, weight=1)
+        self.item_stats_frame.rowconfigure((0), weight=1)
 
-        placeholder1 = tb.Label(self.item_stats_frame, padding=50, background='red')
-        placeholder1.grid(column=0, row=0, sticky='nsew')
-        placeholder2 = tb.Label(self.item_stats_frame, padding=50, background='blue')
-        placeholder2.grid(column=1, row=0, sticky='nsew')
+        # implement actual querying for the collect product_id
+        closest_exp_table = get_table_data(['expiry_date_month', 'expiry_date_year'], 'WHERE products.product_id = 2 ORDER BY expiry_date_month, expiry_date_year ASC LIMIT 3', 'all', True, 
+                       master=self.item_stats_frame, 
+                       searchable=False)
+        # 2 here is the product id of the scanned product
+         
+        closest_exp_table.grid(column=0, row=0, sticky='nsew', rowspan=2)
+        self.total_items_frame = tb.LabelFrame(self.item_stats_frame, text=" total items ", borderwidth=20)
+        self.total_items_frame.grid(column=1, row=0, sticky='nsew')
+        self.total_items_frame.columnconfigure(0, weight=1)
+        self.total_items_frame.rowconfigure(0, weight=1)
+        ## total_items_var queries the database for the total number of this particular product.
+        total_items_var = StringVar(value=(get_table_data(['COUNT (*)'], 'WHERE product_id=2', 'products', False))[0][0])
+        total_items_label = tb.Label(self.total_items_frame, text=(total_items_var.get()), font=('Arial',40), relief='solid', anchor='center')
+
+        total_items_label.grid(column=0, row=0, sticky='nsew')
+        
 
     def checkbtn_clicked(self, check_var, edit_btn_text):
         if check_var.get():
