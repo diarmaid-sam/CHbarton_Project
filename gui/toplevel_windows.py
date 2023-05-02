@@ -195,13 +195,19 @@ class ItemDetails(tb.Toplevel):
         ## of course if there isn't an equivalent barcode within the db, then leave it unfilled
 
         ## top bar Menu for navigating between editor and view
+
         self.main_btn_frame = tb.Frame(self, relief='raised', borderwidth=10)
         self.main_btn_frame.grid(column=0, row=0, sticky='nsew')
         self.main_btn_frame.columnconfigure((0, 1), weight=1)
         self.main_btn_frame.rowconfigure(0, weight=1)
 
-        edit_btn = tb.Radiobutton(self.main_btn_frame, text='Edit Item', bootstyle='warning-toolbutton', width=20)
+        
+        check_var = BooleanVar(value=False)
+        edit_btn_text = StringVar(value="Edit")
+
+        edit_btn = tb.Checkbutton(self.main_btn_frame, textvariable=edit_btn_text, variable=check_var, bootstyle='warning-toolbutton', width=20, command=lambda: self.checkbtn_clicked(check_var, edit_btn_text))
         edit_btn.grid(column=0, row=0, sticky='e', padx=(0, 3))
+        ## when selected bring up 
 
         finish_btn = tb.Button(self.main_btn_frame, text="Enter", width=20, bootstyle='success')
         finish_btn.grid(column=1, row=0, sticky='w', padx=(3, 0))
@@ -236,7 +242,16 @@ class ItemDetails(tb.Toplevel):
         placeholder1.grid(column=0, row=0, sticky='nsew')
         placeholder2 = tb.Label(self.item_stats_frame, padding=50, background='blue')
         placeholder2.grid(column=1, row=0, sticky='nsew')
+
+    def checkbtn_clicked(self, check_var, edit_btn_text):
+        if check_var.get():
+            edit_btn_text.set("Done")
+            print("FLIP TO EDIT FRAME")
+        else:
+            edit_btn_text.set("Edit")
+            print("FLIP TO VIEW SCREEN")
         
+
 
         
 
