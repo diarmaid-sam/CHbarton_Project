@@ -194,6 +194,7 @@ class ItemDetails(tb.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure((1, 2), weight=1)
         # TODO query table where it's like 'get row data where BARCODE = ONE SCANNED'
+        # TODO MUST FINISH IMPLEMENTATION WHEN BARCODE SCANNING IS FUNCTIONAL. several widgets down below depend upon querying database for info, needs to be passed the actual barcode scanned!
         ## of course if there isn't an equivalent barcode within the db, then leave it unfilled
 
         ## top bar Menu for navigating between editor and view
@@ -221,24 +222,46 @@ class ItemDetails(tb.Toplevel):
         self.edit_details_frame.columnconfigure(1, weight=1)
         self.edit_details_frame.rowconfigure((0, 1), weight=1)
 
+        selected_item = StringVar()
+        selected_user = StringVar()
+
         itemname_label = tb.Label(self.edit_details_frame, text="Name:")
         itemname_label.grid(column=0, row=0, sticky='e', padx=(0,5))
         itemname_label.config(font=('Arial', 14))
-        itemname_entry = tb.Entry(self.edit_details_frame)
+        itemname_entry = tb.Entry(self.edit_details_frame, textvariable=selected_item)
         itemname_entry.grid(column=1, row=0, sticky='ew', padx=20)
         
         itemuser_label = tb.Label(self.edit_details_frame, text='Section:')
         itemuser_label.grid(column=0, row=1, sticky='e')
         itemuser_label.config(font=('Arial', 14))
         users = get_table_data(['username'], None, 'users', False)
-        selected_user = StringVar()
         itemuser_entry = tb.OptionMenu(self.edit_details_frame, selected_user, "select a user", *users, direction='below')
         itemuser_entry.grid(column=1, row=1, sticky='ew', padx=20)
+
+        self.view_details_frame = tb.Frame(self, relief='solid', borderwidth=10)
+        self.view_details_frame.grid(column=0, row=1, sticky='nsew')
+        self.view_details_frame.columnconfigure(1, weight=1)
+        self.view_details_frame.rowconfigure((0, 1), weight=1)
+
+        itemname_label_view = tb.Label(self.view_details_frame, text="Name:")
+        itemname_label_view.grid(column=0, row=0, sticky='e', padx=(0,5))
+        itemname_label_view.config(font=('Arial', 14))
+        itemname_entry_view = tb.Label(self.view_details_frame, textvariable=selected_item, relief='solid', bootstyle='light', padding=(10, 5))
+        itemname_entry_view.grid(column=1, row=0, sticky='ew', padx=20)
+        
+        itemuser_label_view = tb.Label(self.view_details_frame, text='Section:')
+        itemuser_label_view.grid(column=0, row=1, sticky='e')
+        itemuser_label_view.config(font=('Arial', 14))
+        itemuser_entry_view = tb.Label(self.view_details_frame, textvariable=selected_user, relief='solid', bootstyle="light", padding=(10, 5))
+        itemuser_entry_view.grid(column=1, row=1, sticky='ew', padx=20)
+
+
+
     
         self.item_stats_frame = tb.Frame(self, bootstyle='warning')
         self.item_stats_frame.grid(column=0, row=2, sticky='nsew')
         self.item_stats_frame.columnconfigure((0, 1), weight=1)
-        self.item_stats_frame.rowconfigure((0), weight=1)
+        self.item_stats_frame.rowconfigure(0, weight=1)
 
         # implement actual querying for the collect product_id
         closest_exp_table = get_table_data(['expiry_date_month', 'expiry_date_year'], 'WHERE products.product_id = 2 ORDER BY expiry_date_month, expiry_date_year ASC LIMIT 3', 'all', True, 
@@ -261,9 +284,11 @@ class ItemDetails(tb.Toplevel):
     def checkbtn_clicked(self, check_var, edit_btn_text):
         if check_var.get():
             edit_btn_text.set("Done")
+            self.edit_details_frame.tkraise()
             print("FLIP TO EDIT FRAME")
         else:
             edit_btn_text.set("Edit")
+            self.view_details_frame.tkraise()
             print("FLIP TO VIEW SCREEN")
         
 

@@ -61,6 +61,6 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
                                           coldata=coldata, 
                                           rowdata=rowdata,
                                           searchable=kwargs.get('searchable'),
-                                          stripecolor='gray')
+                                          stripecolor=('gray', 'white'))
         return table
     return rowdata

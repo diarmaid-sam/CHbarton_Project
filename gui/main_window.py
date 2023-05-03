@@ -222,32 +222,8 @@ class Inventory(ttk.Frame):
         separator = tb.Separator(self.inventory_top_frame, bootstyle='light')
         separator.grid(column=0, row=1, sticky='nsew', columnspan=3, pady=(10,0))
 
-        # table of entire shop_inventory.db
-        # column headers for table
-        coldata = [
-                   {"text": "Product name", "stretch": "false"}, 
-                   {"text": "expiry date", "stretch": "false"}, 
-                   {"text": "quantity", "stretch": "false"},
-                   {"text": "user section", "stretch": "false"},
-                   {"text": "time added", "stretch": "false"}
-                   ]
-        
-        # TODO: row data for table. Currently filled with placeholder values (import from shop_inventory.db database)
-        rowdata = [
-            ('A123', 'IzzyCo', 12, 'delta', 'dieeye'),
-            ('A136', 'Kimdee Inc.', 45, 'delta', 'dieeye'),
-            ('A158', 'Farmadding Co.', 36, 'delta', 'dieeye'),
-            ('A123', 'IzzyCo', 12, 'delta', 'dieeye'),
-            ('A136', 'Kimdee Inc.', 45, 'delta', 'dieeye'),
-            ('A158', 'Farmadding Co.', 36, 'delta', 'dieeye')
-        ]
-        self.inventory_table = tbtable.Tableview(master=self,
-                                                 coldata=coldata,
-                                                 rowdata=rowdata,
-                                                 searchable='true',
-                                                 stripecolor=('gray', 'white')
-                                                      )
-        self.inventory_table.grid(column=0, row=1, sticky='nsew')
+        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_month', 'quantity', 'users.user_id', 'date_added'], None, 'all', True, master=self, searchable='true')
+        inventory_table.grid(column=0, row=1, sticky='nsew')
 
         self.grid()
 
