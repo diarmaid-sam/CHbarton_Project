@@ -37,21 +37,30 @@ class AddItems(tb.Toplevel):
         default_frame_prompt.configure(anchor='center', justify='center')
 
         # mimic the scanning of a product (can only be called if default_frame is in focus)
-        self.default_frame.bind('<Control-Return>', self.on_scan)
-
+        
 
         ## possibly create AddItem_frame when a new item item is being added (and then destroy it afterwards, so that it refreshes)
         
+
         self.AddItem_frame()
         self.default_frame.tkraise()
         self.default_frame.focus()
         self.grid()
+
+        self.bind('<Control-Return>', self.on_scan)
+
 
     def on_scan(self, event):
         # mimics the scanning of an item TODO: replace this with an if statement verifying whether scanning has taken place
         if event.state & 4 and event.keysym == 'Return':
             self.unknown_barcode()
             return
+        
+    # TODO function for when pressing row, for ItemDetails to show up
+    # def show_item_details(self, event):
+       
+    #     return
+    #     ItemDetails(self, self)
     
     def unknown_barcode(self):
         self.unknown_frame = tb.Frame(self)
@@ -59,15 +68,20 @@ class AddItems(tb.Toplevel):
         self.unknown_frame.columnconfigure(0, weight=1)
         self.unknown_frame.rowconfigure(2, weight=1)
 
-        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self))
+        randbtn = tb.Button(self.unknown_frame, text='fk').grid(column=0, row=3)
+
+        # command here does not pass any item_id since it's creating a new item
+        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self, self))
         new_item_btn.grid(column=0, row=0, pady=10)
         search_label = tb.Label(self.unknown_frame, text='or Search existing items')
         search_label.grid(column=0, row=1, sticky='new', pady=(0, 10))
         search_label.config(anchor='center', font=('Arial', 14))
-
-        table = get_table_data(['users.user_id', 'product_name'], condition=None, query_type='all' ,make_table=True, master=self.unknown_frame, searchable=True)
+        table = get_table_data(['products.user_id', 'product_name'], condition=None, query_type='products' ,make_table=True, master=self.unknown_frame, searchable=True)
         table.grid(column=0, row=2, sticky='nsew', padx=10, pady=5)
-        
+
+    
+        # TODO Implement on select of table row, bring up ItemDetails class window
+        # self.bind('<<TreeviewSelect>>', self.show_item_details)
 
     def calcAPI(self, *args, key1, key2, placeholder_list):
         if key2 == "add":
@@ -166,11 +180,7 @@ class AddItems(tb.Toplevel):
 
         self.date_label.config(font=(20))
         self.quantity_label.config(font=(20))
-
-        
-
     
-        
         # create instance of calc_layout class so that we can access methods (to then modify text here)
         digitPanel = calc_layout(master=self.adding_frame, width=((1000*6)/8), height=((800*6)/7), API=self.calcAPI, key1=calc_key1, placeholder_list=placeholder_list)
         digitPanel.grid(column=0, row=1, padx=25, pady=18, sticky='nsew')
@@ -188,11 +198,15 @@ class AddItems(tb.Toplevel):
         addMore = tb.Button(self.buttons, text="Add More", padding=(20, 15), bootstyle="outline-success").grid(column=0, row=0, sticky='sew')
         endSession = tb.Button(self.buttons, text="Done", padding=(20, 15), bootstyle="outline-warning", command=lambda: self.destroy()).grid(column=0, row=1, sticky='new', pady=(15, 0))
 
+
 class ItemDetails(tb.Toplevel):
-    def __init__(self, master, themename="superhero"):
+    def __init__(self, top_level_frame, item_id=None, themename="superhero"):
         super().__init__(title="Register Item", size=(600, 450))
         self.columnconfigure(0, weight=1)
         self.rowconfigure((1, 2), weight=1)
+        self.top_level_frame = top_level_frame
+        self.item_id = item_id
+
         # TODO query table where it's like 'get row data where BARCODE = ONE SCANNED'
         # TODO MUST FINISH IMPLEMENTATION WHEN BARCODE SCANNING IS FUNCTIONAL. several widgets down below depend upon querying database for info, needs to be passed the actual barcode scanned!
         ## of course if there isn't an equivalent barcode within the db, then leave it unfilled
@@ -212,52 +226,52 @@ class ItemDetails(tb.Toplevel):
         edit_btn.grid(column=0, row=0, sticky='e', padx=(0, 3))
         ## when selected bring up 
 
-        finish_btn = tb.Button(self.main_btn_frame, text="Enter", width=20, bootstyle='success')
+        finish_btn = tb.Button(self.main_btn_frame, text="Enter", width=20, bootstyle='success', command=self.finish_btn_click)
         finish_btn.grid(column=1, row=0, sticky='w', padx=(3, 0))
 
+        self.selected_item = StringVar()
+        self.selected_user = StringVar()
 
-        ## edit details (entry box) frame
+        ## EDIT Frame of the item details
         self.edit_details_frame = tb.Frame(self, relief='solid', borderwidth=10)
         self.edit_details_frame.grid(column=0, row=1, sticky='nsew')
         self.edit_details_frame.columnconfigure(1, weight=1)
         self.edit_details_frame.rowconfigure((0, 1), weight=1)
 
-        selected_item = StringVar()
-        selected_user = StringVar()
-
+        # EDIT Frame widgets
         itemname_label = tb.Label(self.edit_details_frame, text="Name:")
         itemname_label.grid(column=0, row=0, sticky='e', padx=(0,5))
         itemname_label.config(font=('Arial', 14))
-        itemname_entry = tb.Entry(self.edit_details_frame, textvariable=selected_item)
+        itemname_entry = tb.Entry(self.edit_details_frame, textvariable=self.selected_item)
         itemname_entry.grid(column=1, row=0, sticky='ew', padx=20)
         
         itemuser_label = tb.Label(self.edit_details_frame, text='Section:')
         itemuser_label.grid(column=0, row=1, sticky='e')
         itemuser_label.config(font=('Arial', 14))
         users = get_table_data(['username'], None, 'users', False)
-        itemuser_entry = tb.OptionMenu(self.edit_details_frame, selected_user, "select a user", *users, direction='below')
+        itemuser_entry = tb.OptionMenu(self.edit_details_frame, self.selected_user, "select a user", *users, direction='below')
         itemuser_entry.grid(column=1, row=1, sticky='ew', padx=20)
 
+        ## VIEW Frame of the item details
         self.view_details_frame = tb.Frame(self, relief='solid', borderwidth=10)
         self.view_details_frame.grid(column=0, row=1, sticky='nsew')
         self.view_details_frame.columnconfigure(1, weight=1)
         self.view_details_frame.rowconfigure((0, 1), weight=1)
 
+        # VIEW Frame widgets
         itemname_label_view = tb.Label(self.view_details_frame, text="Name:")
         itemname_label_view.grid(column=0, row=0, sticky='e', padx=(0,5))
         itemname_label_view.config(font=('Arial', 14))
-        itemname_entry_view = tb.Label(self.view_details_frame, textvariable=selected_item, relief='solid', bootstyle='light', padding=(10, 5))
+        itemname_entry_view = tb.Label(self.view_details_frame, textvariable=self.selected_item, relief='solid', bootstyle='light', padding=(10, 5))
         itemname_entry_view.grid(column=1, row=0, sticky='ew', padx=20)
         
         itemuser_label_view = tb.Label(self.view_details_frame, text='Section:')
         itemuser_label_view.grid(column=0, row=1, sticky='e')
         itemuser_label_view.config(font=('Arial', 14))
-        itemuser_entry_view = tb.Label(self.view_details_frame, textvariable=selected_user, relief='solid', bootstyle="light", padding=(10, 5))
+        itemuser_entry_view = tb.Label(self.view_details_frame, textvariable=self.selected_user, relief='solid', bootstyle="light", padding=(10, 5))
         itemuser_entry_view.grid(column=1, row=1, sticky='ew', padx=20)
 
-
-
-    
+        ## STATS frame for item stats 
         self.item_stats_frame = tb.Frame(self, bootstyle='warning')
         self.item_stats_frame.grid(column=0, row=2, sticky='nsew')
         self.item_stats_frame.columnconfigure((0, 1), weight=1)
@@ -290,11 +304,17 @@ class ItemDetails(tb.Toplevel):
             edit_btn_text.set("Edit")
             self.view_details_frame.tkraise()
             print("FLIP TO VIEW SCREEN")
+
+    # TODO Make a function that checks if there exists information on the product. If so, make StringVar() variables pre-filled 
+    ## set frames to VIEW mode if pre-filled, else set to EDIT mode.
+
+    def finish_btn_click(self):
+        ## TODO submit infomation to db.
+        add_update_item(self.selected_item.get(), self.selected_user.get())
+        self.top_level_frame.adding_frame.tkraise()
+        self.destroy()
+    ### def retrieve_item_data(self)
         
-
-
-        
-
 
 class AddUser(tb.Toplevel):
     def __init__(self, master, themename='superhero'):

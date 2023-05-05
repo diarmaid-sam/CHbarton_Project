@@ -2,6 +2,8 @@ import ttkbootstrap.tableview as tbtable
 
 import sqlite3
 
+# 'Enter' Button widget for ItemDetails top-level frame now updates the products db table, changes the AddItem frame switch to the expiry date + quantity entry frame and closes the ItemDetails top-level frame (all this packed into 'finish_btn_click' function. The function also calls 'add_update_item' function from db_queries.py (also a new function which queries the db.
+
 
 ## GLOBAL 1: list of all users 
 conn = sqlite3.connect("shop_inventory.db")
@@ -43,13 +45,11 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
    
     rowdata = c.fetchall()
     c.close()
-    print(query, rowdata)
     if make_table:
         coldata = []
         for i, colname in enumerate(including_rows):
-            dict_entry = {'text':None, 'stretch': True}
-
             # changes the original column name into a more user-friendly format
+            dict_entry = {'text':None, 'stretch': True}
             colname = colname.replace("_", " ")
             colname = colname.replace("users.", "")
             colname = colname.replace("products.", "")
@@ -62,5 +62,24 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
                                           rowdata=rowdata,
                                           searchable=kwargs.get('searchable'),
                                           stripecolor=('gray', 'white'))
+        
+        
         return table
     return rowdata
+
+def add_update_item(item_name, username, item_id=None):
+    conn = sqlite3.connect("shop_inventory.db")
+    c = conn.cursor()
+
+    c.execute("SELECT user_id FROM users WHERE username = (?)", (username,))
+    username_id = c.fetchone()
+    # if ItemDetails toplevel was created from 'New item' btn widget, then no item_id will be passed (since it's just being created)
+    if item_id == None:
+        c.execute("INSERT INTO products (product_name, user_id) VALUES (?, ?)", ((item_name, username_id[0])))
+    # else it's modifying pre-existing 
+    else:
+        c.execute("UPDATE products SET product_name = ?, user_id = ? WHERE product_id = ?", ((item_name, username_id[0], item_id)))
+
+    conn.commit()
+    c.close()
+    return

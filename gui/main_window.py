@@ -219,7 +219,7 @@ class Inventory(ttk.Frame):
         add_button = tb.Button(self.inventory_top_frame, text="Add", padding=(0, 10), command=lambda:AddItems(self), bootstyle='outline-success')
         add_button.grid(column=2, row=0, sticky='ew', padx=(10))
 
-        separator = tb.Separator(self.inventory_top_frame, bootstyle='light')
+        separator = tb.Separator(self.inventory_top_frame, bootstyle='light') 
         separator.grid(column=0, row=1, sticky='nsew', columnspan=3, pady=(10,0))
 
         inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_month', 'quantity', 'users.user_id', 'date_added'], None, 'all', True, master=self, searchable='true')
@@ -282,25 +282,29 @@ class Users(ttk.Frame):
 
         notebooks = []
         for i, user in enumerate(users_list):
-            
+            # get user_id 
+            stringggg = 'WHERE username = diarmaid'
+            user_id = get_table_data(['user_id'], f'WHERE username = "{user[0]}"', 'users', False)
 
             #creating right frame notebooks 
             notebook = tb.Notebook(self.user_rf)
-            
+
 
             frame1 = tb.Frame(notebook, bootstyle='dark')
             frame1.grid(column=0, row=0, sticky='nsew')
             frame1.columnconfigure(0, weight=1)
             frame1.rowconfigure(0, weight=1)
-            user_section_table = tbtable.Tableview(master=frame1, searchable='true')
+            user_section_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_month', 'quantity', 'date_added'], f'WHERE users.user_id = {user_id[0][0]}', 'all', True, master=frame1, searchable=True)
             user_section_table.grid(column=0, row=0, sticky='nsew')
             notebook.add(frame1, text=user[0] + "'s section")
+
+            frame2_table_query = f"WHERE user_id = {user_id[0][0]}"
 
             frame2 = tb.Frame(notebook, bootstyle='light')
             frame2.grid(column=0, row=0, sticky='nsew')
             frame2.columnconfigure(0, weight=1)
             frame2.rowconfigure(0, weight=1)
-            user_items_table = tbtable.Tableview(master=frame2, searchable='true')
+            user_items_table = get_table_data(['product_name'], frame2_table_query, 'products', True, master=frame2, searchable=True)
             user_items_table.grid(column=0, row=0, sticky='nsew')
 
             notebook.add(frame2, text=user[0] + "'s items")
@@ -314,23 +318,6 @@ class Users(ttk.Frame):
             user_button = tb.Button(self.user_list_frame, text=user, padding=(0, 5), bootstyle='outline-primary', command=lambda i=i: notebooks[i].tkraise())
             user_button.grid(column=0, row=i, sticky='nsew', padx=5, pady=10)
             self.user_list_frame.rowconfigure(i, weight=1)
-
-            ## CONSTRUCT RIGHT FRAME NOTEBOOKS
-        
-        
-        
-
-
-
-            ##
-
-        ### RIGHT FRAME STRUCTURE ###
-
-
-
-
-
-
 
         self.grid()
 
@@ -359,6 +346,7 @@ class MainFrame(tb.Frame):
 
     def show_frame(self, cont):
         frame = self.frames[cont]
+        
         frame.tkraise()
 
     def __navBar(self): 
@@ -378,4 +366,5 @@ class MainFrame(tb.Frame):
 if __name__ == "__main__":
     app = tb.Window("Software", themename="superhero", minsize=(800, 800))
     MainFrame(app)
+    
     app.mainloop()      
