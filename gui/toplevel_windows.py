@@ -197,7 +197,10 @@ class AddItems(tb.Toplevel):
         self.buttons.rowconfigure(1, weight=1)
 
         addMore = tb.Button(self.buttons, text="Add More", padding=(20, 15), bootstyle="outline-success").grid(column=0, row=0, sticky='sew')
-        endSession = tb.Button(self.buttons, text="Done", padding=(20, 15), bootstyle="outline-warning", command=lambda: self.destroy()).grid(column=0, row=1, sticky='new', pady=(15, 0))
+        ## both sumbit data to table and close toplevel window
+
+        endSession = tb.Button(self.buttons, text="Done", padding=(20, 15), bootstyle="outline-warning", command=lambda: (self.destroy(), submit_addItems(self.product_id, int(self.date.get()[:2]), int(self.date.get()[3:]), int(self.quantity.get()))))
+        endSession.grid(column=0, row=1, sticky='new', pady=(15, 0))
 
 
 class ItemDetails(tb.Toplevel):
@@ -314,7 +317,10 @@ class ItemDetails(tb.Toplevel):
         if self.item_id == None:
             # pass the new product_id to the AddItems toplevel frame
             self.top_level_frame.product_id = get_table_data(['product_id'], f'WHERE product_name = "{self.selected_item.get()}"', 'products', False)[0][0]
+        ## elif self.item_id != None AND TODO (ItemDetails window has been accessed via the + (add item) button)
+            ## TODO need to add some variable that tracks where the window has been accessed (e.g. a state button which can be 'Add' or 'View' state.)
         self.top_level_frame.adding_frame.tkraise()
+        ## TODO else destroy
         self.destroy()
     ### def retrieve_item_data(self)
         

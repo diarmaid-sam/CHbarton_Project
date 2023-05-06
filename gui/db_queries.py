@@ -1,6 +1,7 @@
 import ttkbootstrap.tableview as tbtable
 
 import sqlite3
+import datetime
 
 # 'Enter' Button widget for ItemDetails top-level frame now updates the products db table, changes the AddItem frame switch to the expiry date + quantity entry frame and closes the ItemDetails top-level frame (all this packed into 'finish_btn_click' function. The function also calls 'add_update_item' function from db_queries.py (also a new function which queries the db.
 
@@ -79,6 +80,22 @@ def add_update_item(item_name, username, item_id=None):
     # else it's modifying pre-existing 
     else:
         c.execute("UPDATE products SET product_name = ?, user_id = ? WHERE product_id = ?", ((item_name, username_id[0], item_id)))
+
+    conn.commit()
+    c.close()
+    return
+
+def submit_addItems(product_id, exp_month, exp_year, quantity):
+
+    conn = sqlite3.connect("shop_inventory.db")
+    c = conn.cursor()
+
+    # getting the date and time now 
+    datenow = datetime.datetime.now()
+    formatted_date = datenow.strftime("%Y-%m-%d %H:%M:%S")
+    
+    print(product_id, exp_month, exp_year, quantity, formatted_date)
+    c.execute("INSERT INTO inventory (expiry_date_month, expiry_date_year, quantity, date_added, product_id) VALUES (?, ?, ?, ?, ?)", (exp_month, exp_year, quantity, formatted_date, product_id))
 
     conn.commit()
     c.close()
