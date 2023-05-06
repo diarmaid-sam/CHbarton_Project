@@ -294,6 +294,7 @@ class Users(ttk.Frame):
             frame1.grid(column=0, row=0, sticky='nsew')
             frame1.columnconfigure(0, weight=1)
             frame1.rowconfigure(0, weight=1)
+            
             user_section_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_month', 'quantity', 'date_added'], f'WHERE users.user_id = {user_id[0][0]}', 'all', True, master=frame1, searchable=True)
             user_section_table.grid(column=0, row=0, sticky='nsew')
             notebook.add(frame1, text=user[0] + "'s section")

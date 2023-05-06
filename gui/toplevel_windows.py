@@ -19,6 +19,7 @@ class AddItems(tb.Toplevel):
         super().__init__(title="Add Items", size=(1000, 800), resizable=(False, True))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)  
+        self.product_id = None
         global placeholder_list
         global calc_key1
         # lists are necessary as updating values using int or str data_types causes issues
@@ -71,7 +72,7 @@ class AddItems(tb.Toplevel):
         randbtn = tb.Button(self.unknown_frame, text='fk').grid(column=0, row=3)
 
         # command here does not pass any item_id since it's creating a new item
-        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self, self))
+        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self, item_id=None))
         new_item_btn.grid(column=0, row=0, pady=10)
         search_label = tb.Label(self.unknown_frame, text='or Search existing items')
         search_label.grid(column=0, row=1, sticky='new', pady=(0, 10))
@@ -299,11 +300,9 @@ class ItemDetails(tb.Toplevel):
         if check_var.get():
             edit_btn_text.set("Done")
             self.edit_details_frame.tkraise()
-            print("FLIP TO EDIT FRAME")
         else:
             edit_btn_text.set("Edit")
             self.view_details_frame.tkraise()
-            print("FLIP TO VIEW SCREEN")
 
     # TODO Make a function that checks if there exists information on the product. If so, make StringVar() variables pre-filled 
     ## set frames to VIEW mode if pre-filled, else set to EDIT mode.
@@ -311,6 +310,10 @@ class ItemDetails(tb.Toplevel):
     def finish_btn_click(self):
         ## TODO submit infomation to db.
         add_update_item(self.selected_item.get(), self.selected_user.get())
+        # if this is a new item...
+        if self.item_id == None:
+            # pass the new product_id to the AddItems toplevel frame
+            self.top_level_frame.product_id = get_table_data(['product_id'], f'WHERE product_name = "{self.selected_item.get()}"', 'products', False)[0][0]
         self.top_level_frame.adding_frame.tkraise()
         self.destroy()
     ### def retrieve_item_data(self)
