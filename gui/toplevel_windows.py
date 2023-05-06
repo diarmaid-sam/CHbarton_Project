@@ -7,7 +7,8 @@ import datetime
 
 from button_mappings import calc_layout
 from db_queries import *
-
+# FOR SIMULATION OF SCANNING BARCODE:
+import random
 
 # what is necessary:
 # scan item - If the barcode is registered in the database, then the fields are automatically filled. If the barcode isn't registered, then the 'register product' comes up.
@@ -47,15 +48,23 @@ class AddItems(tb.Toplevel):
         self.default_frame.tkraise()
         self.default_frame.focus()
         self.grid()
+        # here control-return is analagous to scanning and barcode generates a random number between 0 and 1. If 0, then item not recognsied, else recognised
+        self.bind('<Control-Return>', lambda event, barcode=random.randint(0, 1): self.on_scan(event, barcode))
 
-        self.bind('<Control-Return>', self.on_scan)
-
-
-    def on_scan(self, event):
+    # function to determine wherher item scanned is either registered or not with db
+    def on_scan(self, event, barcode):
         # mimics the scanning of an item TODO: replace this with an if statement verifying whether scanning has taken place
         if event.state & 4 and event.keysym == 'Return':
-            self.unknown_barcode()
-            return
+            # if barcode is true (1), then we simulate as if the code is recognised
+            if barcode:
+                # TODO take product_id and immediately bring up Additem_frame
+                self.product_i = barcode
+                self.adding_frame.tkraise()
+
+            else:
+                self.unknown_barcode()  
+    
+            
         
     # TODO function for when pressing row, for ItemDetails to show up
     # def show_item_details(self, event):
@@ -68,8 +77,6 @@ class AddItems(tb.Toplevel):
         self.unknown_frame.grid(column=0, row=0, sticky='nsew')
         self.unknown_frame.columnconfigure(0, weight=1)
         self.unknown_frame.rowconfigure(2, weight=1)
-
-        randbtn = tb.Button(self.unknown_frame, text='fk').grid(column=0, row=3)
 
         # command here does not pass any item_id since it's creating a new item
         new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self, item_id=None))
@@ -204,12 +211,13 @@ class AddItems(tb.Toplevel):
 
 
 class ItemDetails(tb.Toplevel):
-    def __init__(self, top_level_frame, item_id=None, themename="superhero"):
+    def __init__(self, top_level_frame, item_id=None, state="add", themename="superhero"):
         super().__init__(title="Register Item", size=(600, 450))
         self.columnconfigure(0, weight=1)
         self.rowconfigure((1, 2), weight=1)
         self.top_level_frame = top_level_frame
         self.item_id = item_id
+        self.state = state
 
         # TODO query table where it's like 'get row data where BARCODE = ONE SCANNED'
         # TODO MUST FINISH IMPLEMENTATION WHEN BARCODE SCANNING IS FUNCTIONAL. several widgets down below depend upon querying database for info, needs to be passed the actual barcode scanned!
@@ -314,15 +322,17 @@ class ItemDetails(tb.Toplevel):
         ## TODO submit infomation to db.
         add_update_item(self.selected_item.get(), self.selected_user.get())
         # if this is a new item...
-        if self.item_id == None:
-            # pass the new product_id to the AddItems toplevel frame
-            self.top_level_frame.product_id = get_table_data(['product_id'], f'WHERE product_name = "{self.selected_item.get()}"', 'products', False)[0][0]
-        ## elif self.item_id != None AND TODO (ItemDetails window has been accessed via the + (add item) button)
-            ## TODO need to add some variable that tracks where the window has been accessed (e.g. a state button which can be 'Add' or 'View' state.)
-        self.top_level_frame.adding_frame.tkraise()
-        ## TODO else destroy
+        if self.state == 'add':
+            if self.item_id == None:
+                # pass the new product_id to the AddItems toplevel frame
+                self.top_level_frame.product_id = get_table_data(['product_id'], f'WHERE product_name = "{self.selected_item.get()}"', 'products', False)[0][0]
+            ## else: pass the product_id of the item already selected to the AddItems toplevel window, then raise adding_frame
+            else:
+                self.top_level_frame.product_id = self.item_id
+            # raise adding frame
+            self.top_level_frame.adding_frame.tkraise()
+        ## if self.state == 'view', then the toplevel window is immediately destroyed when exited, while if it's 'add' then AddItems frame is raised.
         self.destroy()
-    ### def retrieve_item_data(self)
         
 
 class AddUser(tb.Toplevel):

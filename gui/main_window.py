@@ -222,7 +222,7 @@ class Inventory(ttk.Frame):
         separator = tb.Separator(self.inventory_top_frame, bootstyle='light') 
         separator.grid(column=0, row=1, sticky='nsew', columnspan=3, pady=(10,0))
 
-        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'users.username', 'date_added'], None, 'all', True, master=self, searchable='true')
+        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'users.user_id', 'date_added'], None, 'all', True, master=self, searchable='true')
         inventory_table.grid(column=0, row=1, sticky='nsew')
 
         self.grid()

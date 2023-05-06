@@ -94,7 +94,7 @@ def submit_addItems(product_id, exp_month, exp_year, quantity):
     datenow = datetime.datetime.now()
     formatted_date = datenow.strftime("%Y-%m-%d %H:%M:%S")
     
-    print(product_id, exp_month, exp_year, quantity, formatted_date)
+    # sumbit info to relevant table
     c.execute("INSERT INTO inventory (expiry_date_month, expiry_date_year, quantity, date_added, product_id) VALUES (?, ?, ?, ?, ?)", (exp_month, exp_year, quantity, formatted_date, product_id))
 
     conn.commit()
