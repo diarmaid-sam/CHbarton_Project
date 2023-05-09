@@ -63,10 +63,26 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
                                           rowdata=rowdata,
                                           searchable=kwargs.get('searchable'),
                                           stripecolor=('gray', 'white'))
-        
+        # here if 'state' is true, i.e. has a value, then the table to be created is interactable and so double-clicking column calls the double_click function
+        if kwargs.get('state'):
+            # master is where the ItemDetails toplevel is to be placed, event is the event object, state is the type of toplevel created (i.e. used for adding items or editting item details) and top_level is optional, used only if state='add' (enables the adding_frame to be tkraised)
+            print(kwargs.get('top_level'), "hello")
+            table.bind_all("<Double-1>", lambda event: double_click(kwargs.get('master'), event, kwargs.get('state'), kwargs.get('top_level')))
         
         return table
     return rowdata
+
+def double_click(self, event, state, tlf):
+        from toplevel_windows import ItemDetails
+        # retrieve the id of the row selected and get it's 'values' (stored in a dictionary)
+        item = event.widget.focus()
+        item_details = (event.widget.item(item, 'values'))
+        # for sake of a standard, the product name will always come first in a table (if the table is to be interactable), therefore we can say the product_name is at element '0'
+        product_name = item_details[0]
+        product_id = get_table_data(['product_id'], f'WHERE product_name = "{product_name}"', 'products', False)[0][0]
+        ItemDetails(product_id, state, tlf)
+        # def __init__(self, item_id=None, state="add", top_level_frame=None, themename="superhero"):
+    
 
 def add_update_item(item_name, username, item_id=None):
     conn = sqlite3.connect("shop_inventory.db")

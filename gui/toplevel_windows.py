@@ -64,14 +64,6 @@ class AddItems(tb.Toplevel):
             else:
                 self.unknown_barcode()  
     
-            
-        
-    # TODO function for when pressing row, for ItemDetails to show up
-    # def show_item_details(self, event):
-       
-    #     return
-    #     ItemDetails(self, self)
-    
     def unknown_barcode(self):
         self.unknown_frame = tb.Frame(self)
         self.unknown_frame.grid(column=0, row=0, sticky='nsew')
@@ -84,27 +76,10 @@ class AddItems(tb.Toplevel):
         search_label = tb.Label(self.unknown_frame, text='or Search existing items')
         search_label.grid(column=0, row=1, sticky='new', pady=(0, 10))
         search_label.config(anchor='center', font=('Arial', 14))
-        self.table = get_table_data(['products.user_id', 'product_name'], condition=None, query_type='products' ,make_table=True, master=self.unknown_frame, searchable=True)
+        self.table = get_table_data(['product_name'], condition=None, query_type='products' ,make_table=True, master=self.unknown_frame, searchable=True, state='add', top_level=self)
         self.table.grid(column=0, row=2, sticky='nsew', padx=10, pady=5)
 
-        self.table.bind_all('<Double-1>', self.handle_click)
-
-    def handle_click(self, event):
-        # TODO MAKE IT SO TO SELECT THE FIRST IN THE ROW (HAS ID OF X001) YOU MUST DOUBLE-CLICK (JUST TO MAKE SURE THEY MEANT TO.)
-        # I DONT THINK IT'S POSSIBLE TO DISTINGUISH BETWEEN THE COLUMNS AND THE 1ST ROW SO MIGHT JUST HAVE TO GO WITH IT, AND HAVE THIS BUG!!!
-
-
-        item = event.widget.focus()
-        item_details = (event.widget.item(item, 'values'))
-        product_name = item_details[1]
-        product_id = get_table_data(['product_id'], f'WHERE product_name = "{item_details[1]}"', 'products', False)[0][0]
-        ItemDetails(self, item_id=product_id)
-        #item = self.table.(x=event.x, y=event.y)
-        # 1 = 0x7fe4e3272d10
-        #print( self.table.iidmap)
-        # TODO Implement on select of table row, bring up ItemDetails class window
-        # self.bind('<<self.tableSelect>>', self.show_item_details)
-
+    
     def calcAPI(self, *args, key1, key2, placeholder_list):
         if key2 == "add":
             # if you are entering the expirey date string, the following rules apply (and the relevant date widget is updated)
@@ -225,7 +200,7 @@ class AddItems(tb.Toplevel):
 
 
 class ItemDetails(tb.Toplevel):
-    def __init__(self, top_level_frame, item_id=None, state="add", themename="superhero"):
+    def __init__(self, item_id=None, state="add", top_level_frame=None, themename="superhero"):
         super().__init__(title="Register Item", size=(600, 450))
         self.columnconfigure(0, weight=1)
         self.rowconfigure((1, 2), weight=1)
@@ -345,19 +320,20 @@ class ItemDetails(tb.Toplevel):
     ## set frames to VIEW mode if pre-filled, else set to EDIT mode.
 
     def finish_btn_click(self):
-        ## TODO submit infomation to db.
-        add_update_item(self.selected_item.get(), self.selected_user.get())
-        # if this is a new item...
+        
         if self.state == 'add':
+            # only 'add' state ItemDetails will trigger the raising of the adding_frame 
+            self.top_level_frame.adding_frame.tkraise()
+            # if this is a new item then item_id == None (until new entry is made in db)
             if self.item_id == None:
                 # pass the new product_id to the AddItems toplevel frame
+                add_update_item(self.selected_item.get(), self.selected_user.get())
                 self.top_level_frame.product_id = get_table_data(['product_id'], f'WHERE product_name = "{self.selected_item.get()}"', 'products', False)[0][0]
-            ## else: pass the product_id of the item already selected to the AddItems toplevel window, then raise adding_frame
             else:
                 self.top_level_frame.product_id = self.item_id
-            # raise adding frame
-            self.top_level_frame.adding_frame.tkraise()
-        ## if self.state == 'view', then the toplevel window is immediately destroyed when exited, while if it's 'add' then AddItems frame is raised.
+            ## else: pass the product_id of the item already selected to the AddItems toplevel window, then raise adding_frame
+        if self.item_id != None:
+            add_update_item(self.selected_item.get(), self.selected_user.get(), item_id=self.item_id)
         self.destroy()
         
 

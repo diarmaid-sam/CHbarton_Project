@@ -223,10 +223,11 @@ class Inventory(ttk.Frame):
         separator = tb.Separator(self.inventory_top_frame, bootstyle='light') 
         separator.grid(column=0, row=1, sticky='nsew', columnspan=3, pady=(10,0))
 
-        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'users.user_id', 'date_added'], None, 'all', True, master=self, searchable='true')
+        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'users.user_id', 'date_added'], None, 'all', True, master=self, searchable='true', state='view')
         inventory_table.grid(column=0, row=1, sticky='nsew')
 
         self.grid()
+
 
 class Users(ttk.Frame):
     def __init__(self, container):
@@ -342,10 +343,12 @@ class MainFrame(tb.Frame):
             frame = F(self)
             self.frames[F] = frame
             frame.grid(row=1, column=0, sticky='nsew')
-
+            
+        self.bind_class(tbtable.Tableview, "<Double-1>", self.double_click)
         self.show_frame(DashBoard)
         self.grid()
 
+    # can probably keep track of which frame is opened at any given time to be able to then switch to that frame on-boot 
     def show_frame(self, cont):
         frame = self.frames[cont]
         
@@ -363,6 +366,13 @@ class MainFrame(tb.Frame):
         self.navBar.columnconfigure(1, weight=1)
         self.navBar.columnconfigure(2, weight=1)
         self.navBar.columnconfigure(3, weight=1)
+    
+    def double_click(self, event):
+        item = event.widget.focus()
+        item_details = (event.widget.item(item, 'values'))
+        product_name = item_details[1]
+        product_id = get_table_data(['product_id'], f'WHERE product_name = "{item_details[1]}"', 'products', False)[0][0]
+        ItemDetails(self, item_id=product_id)
 
 
 if __name__ == "__main__":
