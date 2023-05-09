@@ -80,6 +80,7 @@ class DashBoard(tb.Frame):
         items_expired_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='danger')
         items_expired_pb['value'] = ((int(self.total_expired.get())/int(self.total_items.get()))*100)
         items_expired_pb.grid(column=2, row=0, sticky='ns', padx=(0, 12), rowspan=2)
+        
 
 
         # frame to hold labels for the shop status
@@ -295,7 +296,7 @@ class Users(ttk.Frame):
             frame1.columnconfigure(0, weight=1)
             frame1.rowconfigure(0, weight=1)
             
-            user_section_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_month', 'quantity', 'date_added'], f'WHERE users.user_id = {user_id[0][0]}', 'all', True, master=frame1, searchable=True)
+            user_section_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'date_added'], f'WHERE users.user_id = {user_id[0][0]}', 'all', True, master=frame1, searchable=True)
             user_section_table.grid(column=0, row=0, sticky='nsew')
             notebook.add(frame1, text=user[0] + "'s section")
 

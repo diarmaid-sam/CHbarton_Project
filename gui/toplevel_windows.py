@@ -49,7 +49,7 @@ class AddItems(tb.Toplevel):
         self.default_frame.focus()
         self.grid()
         # here control-return is analagous to scanning and barcode generates a random number between 0 and 1. If 0, then item not recognsied, else recognised
-        self.bind('<Control-Return>', lambda event, barcode=random.randint(0, 1): self.on_scan(event, barcode))
+        self.bind('<Control-Return>', lambda event, barcode=0: self.on_scan(event, barcode))
 
     # function to determine wherher item scanned is either registered or not with db
     def on_scan(self, event, barcode):
@@ -58,7 +58,7 @@ class AddItems(tb.Toplevel):
             # if barcode is true (1), then we simulate as if the code is recognised
             if barcode:
                 # TODO take product_id and immediately bring up Additem_frame
-                self.product_i = barcode
+                self.product_id = barcode
                 self.adding_frame.tkraise()
 
             else:
@@ -84,12 +84,26 @@ class AddItems(tb.Toplevel):
         search_label = tb.Label(self.unknown_frame, text='or Search existing items')
         search_label.grid(column=0, row=1, sticky='new', pady=(0, 10))
         search_label.config(anchor='center', font=('Arial', 14))
-        table = get_table_data(['products.user_id', 'product_name'], condition=None, query_type='products' ,make_table=True, master=self.unknown_frame, searchable=True)
-        table.grid(column=0, row=2, sticky='nsew', padx=10, pady=5)
+        self.table = get_table_data(['products.user_id', 'product_name'], condition=None, query_type='products' ,make_table=True, master=self.unknown_frame, searchable=True)
+        self.table.grid(column=0, row=2, sticky='nsew', padx=10, pady=5)
 
-    
+        self.table.bind_all('<Double-1>', self.handle_click)
+
+    def handle_click(self, event):
+        # TODO MAKE IT SO TO SELECT THE FIRST IN THE ROW (HAS ID OF X001) YOU MUST DOUBLE-CLICK (JUST TO MAKE SURE THEY MEANT TO.)
+        # I DONT THINK IT'S POSSIBLE TO DISTINGUISH BETWEEN THE COLUMNS AND THE 1ST ROW SO MIGHT JUST HAVE TO GO WITH IT, AND HAVE THIS BUG!!!
+
+
+        item = event.widget.focus()
+        item_details = (event.widget.item(item, 'values'))
+        product_name = item_details[1]
+        product_id = get_table_data(['product_id'], f'WHERE product_name = "{item_details[1]}"', 'products', False)[0][0]
+        ItemDetails(self, item_id=product_id)
+        #item = self.table.(x=event.x, y=event.y)
+        # 1 = 0x7fe4e3272d10
+        #print( self.table.iidmap)
         # TODO Implement on select of table row, bring up ItemDetails class window
-        # self.bind('<<TreeviewSelect>>', self.show_item_details)
+        # self.bind('<<self.tableSelect>>', self.show_item_details)
 
     def calcAPI(self, *args, key1, key2, placeholder_list):
         if key2 == "add":
@@ -305,6 +319,18 @@ class ItemDetails(tb.Toplevel):
         total_items_label = tb.Label(self.total_items_frame, text=(total_items_var.get()), font=('Arial',40), relief='solid', anchor='center')
 
         total_items_label.grid(column=0, row=0, sticky='nsew')
+
+        if self.item_id != None:
+            
+            # pre-fill variable detail widgets
+            item_details = get_table_data(['*'], F'WHERE products.product_id = {self.item_id}', 'products', False)[0]
+            item_name = item_details[1]
+            item_username = get_table_data(['username'], f'WHERE user_id = {item_details[2]}', 'users', False)[0][0]
+            self.selected_item.set(item_name)
+            self.selected_user.set(item_username)
+            # item_username = get_table_data(['username'], f'WHERE user_id = {self.item_id}', 'users', False)[0][0]
+            # self.selected_user.set(item_username)
+
         
 
     def checkbtn_clicked(self, check_var, edit_btn_text):
