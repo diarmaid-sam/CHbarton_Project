@@ -66,7 +66,6 @@ def get_table_data(including_rows, condition,  query_type, make_table, **kwargs)
         # here if 'state' is true, i.e. has a value, then the table to be created is interactable and so double-clicking column calls the double_click function
         if kwargs.get('state'):
             # master is where the ItemDetails toplevel is to be placed, event is the event object, state is the type of toplevel created (i.e. used for adding items or editting item details) and top_level is optional, used only if state='add' (enables the adding_frame to be tkraised)
-            print(kwargs.get('top_level'), "hello")
             table.bind_all("<Double-1>", lambda event: double_click(kwargs.get('master'), event, kwargs.get('state'), kwargs.get('top_level')))
         
         return table

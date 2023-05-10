@@ -21,12 +21,13 @@ class AddItems(tb.Toplevel):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)  
         self.product_id = None
+
+
         global placeholder_list
         global calc_key1
         # lists are necessary as updating values using int or str data_types causes issues
         placeholder_list = ['', '']
-        calc_key1 = [0]
-        
+        calc_key1 = [0]        
         ## DEFAULT FRAME
         self.default_frame = tb.Frame(self, bootstyle='danger')
         self.default_frame.grid(column=0, row=0, sticky='nsew')
@@ -50,6 +51,8 @@ class AddItems(tb.Toplevel):
         self.grid()
         # here control-return is analagous to scanning and barcode generates a random number between 0 and 1. If 0, then item not recognsied, else recognised
         self.bind('<Control-Return>', lambda event, barcode=0: self.on_scan(event, barcode))
+        self.bind_class("Toplevel", "<Destroy>", lambda event: tl_destroy(self, event))
+
 
     # function to determine wherher item scanned is either registered or not with db
     def on_scan(self, event, barcode):
@@ -71,7 +74,7 @@ class AddItems(tb.Toplevel):
         self.unknown_frame.rowconfigure(2, weight=1)
 
         # command here does not pass any item_id since it's creating a new item
-        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(self, item_id=None))
+        new_item_btn = tb.Button(self.unknown_frame, text='New Item?', padding=(30, 10), command=lambda:ItemDetails(item_id=None, top_level_frame=self))
         new_item_btn.grid(column=0, row=0, pady=10)
         search_label = tb.Label(self.unknown_frame, text='or Search existing items')
         search_label.grid(column=0, row=1, sticky='new', pady=(0, 10))
@@ -208,6 +211,7 @@ class ItemDetails(tb.Toplevel):
         self.item_id = item_id
         self.state = state
 
+
         # TODO query table where it's like 'get row data where BARCODE = ONE SCANNED'
         # TODO MUST FINISH IMPLEMENTATION WHEN BARCODE SCANNING IS FUNCTIONAL. several widgets down below depend upon querying database for info, needs to be passed the actual barcode scanned!
         ## of course if there isn't an equivalent barcode within the db, then leave it unfilled
@@ -305,6 +309,9 @@ class ItemDetails(tb.Toplevel):
             self.selected_user.set(item_username)
             # item_username = get_table_data(['username'], f'WHERE user_id = {self.item_id}', 'users', False)[0][0]
             # self.selected_user.set(item_username)
+        # when toplevel window is closed, call function (refresh app to load potentially new info)
+        self.bind_class("Toplevel", "<Destroy>", lambda event: tl_destroy(self, event))
+
 
         
 
@@ -344,6 +351,7 @@ class AddUser(tb.Toplevel):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
+
         
         username_entry_label = tb.Label(self, text="Enter the user's name:")
         username_entry_label.grid(column=0, row=0, sticky='s')
@@ -355,8 +363,8 @@ class AddUser(tb.Toplevel):
         submit_username = tb.Button(self, text='Submit', bootstyle='primary', command=lambda: self.submit())
         submit_username.grid(column=0, row=2, sticky='n', pady=(20, 0))
 
-        self.bind('<Return>', lambda event: submit_username.invoke())
-
+        self.bind('<Return>', lambda event: submit_username.invoke())# when toplevel window is closed, call function (refresh app to load potentially new info)
+        self.bind_class("Toplevel", "<Destroy>", lambda event: tl_destroy(self, event))
 
     def submit(self):
 
@@ -375,7 +383,6 @@ class DeleteUser(tb.Toplevel):
         super().__init__(title='delete User', size=(400, 500))
         self.columnconfigure(0, weight=3)
         self.columnconfigure(1, weight=1)
-        
         for i, user in enumerate(users_list):
             self.rowconfigure(i, weight=1)
 
@@ -385,11 +392,12 @@ class DeleteUser(tb.Toplevel):
             username_label.configure(anchor="center")
 
             delete_button = tb.Button(self, text='delete', padding=(0, 10), bootstyle="danger", command=lambda i=i, username=user: self.delete_user(username))
-            delete_button.grid(column=1, row=i, sticky='ew', padx=10)
+            delete_button.grid(column=1, row=i, sticky='ew', padx=10)# when toplevel window is closed, call function (refresh app to load potentially new info)
+        self.bind_class("Toplevel", "<Destroy>", lambda event: tl_destroy(self, event))
+
 
     def delete_user(self, username):
         ## TODO: must transfer all items under this user's name to another user (cannot delete otherwise)
-
         conn = sqlite3.connect("shop_inventory.db")
         c = conn.cursor()
 
@@ -399,6 +407,14 @@ class DeleteUser(tb.Toplevel):
         c.close()
 
         self.destroy()
+
+def tl_destroy(self, event):
+    from main_window import app
+    if not event.widget.winfo_exists():
+        print("IM DESTROYED")
+
+
+
         
 
 

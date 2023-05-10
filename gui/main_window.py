@@ -223,7 +223,7 @@ class Inventory(ttk.Frame):
         separator = tb.Separator(self.inventory_top_frame, bootstyle='light') 
         separator.grid(column=0, row=1, sticky='nsew', columnspan=3, pady=(10,0))
 
-        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'users.user_id', 'date_added'], None, 'all', True, master=self, searchable='true', state='view')
+        inventory_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'username', 'date_added'], None, 'all', True, master=self, searchable='true', state='view')
         inventory_table.grid(column=0, row=1, sticky='nsew')
 
         self.grid()
@@ -274,7 +274,7 @@ class Users(ttk.Frame):
         add_user_button.grid(column=0, row=0, sticky='nsew', padx=5, pady=5)
         edit_user_button = tb.Button(self.manage_users_frame, text='edit users', padding=(0, 10), bootstyle='outline')
         edit_user_button.grid(column=1, row=0, sticky='nsew', padx=(0, 5), pady=5)
-        remove_user_button = tb.Button(self.manage_users_frame, text='remove users', padding=(0, 10), bootstyle='outline-danger', command= lambda:DeleteUser(self))
+        remove_user_button = tb.Button(self.manage_users_frame, text='remove users', padding=(0, 10), bootstyle='outline-danger', command= lambda:DeleteUser(self, app))
         remove_user_button.grid(column=2, row=0, sticky='nsew', padx=(0, 5), pady=5)
 
         # new frame for user associated buttons (variable number)
@@ -344,7 +344,7 @@ class MainFrame(tb.Frame):
             self.frames[F] = frame
             frame.grid(row=1, column=0, sticky='nsew')
             
-        self.bind_class(tbtable.Tableview, "<Double-1>", self.double_click)
+        
         self.show_frame(DashBoard)
         self.grid()
 
@@ -365,18 +365,14 @@ class MainFrame(tb.Frame):
         self.navBar.columnconfigure(0, weight=1)
         self.navBar.columnconfigure(1, weight=1)
         self.navBar.columnconfigure(2, weight=1)
-        self.navBar.columnconfigure(3, weight=1)
+        self.navBar.columnconfigure(3, weight=1)   
     
-    def double_click(self, event):
-        item = event.widget.focus()
-        item_details = (event.widget.item(item, 'values'))
-        product_name = item_details[1]
-        product_id = get_table_data(['product_id'], f'WHERE product_name = "{item_details[1]}"', 'products', False)[0][0]
-        ItemDetails(self, item_id=product_id)
-
-
 if __name__ == "__main__":
+    
     app = tb.Window("Software", themename="superhero", minsize=(800, 800))
     MainFrame(app)
+    app.place_window_center()
     
-    app.mainloop()      
+    app.mainloop()
+    
+    
