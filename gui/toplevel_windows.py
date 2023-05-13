@@ -379,7 +379,7 @@ class AddUser(tb.Toplevel):
         self.destroy()
 
 class DeleteUser(tb.Toplevel):
-    def __init__(self, master, themename='superhero'):
+    def __init__(self, master, root, themename='superhero'):
         super().__init__(title='delete User', size=(400, 500))
         self.columnconfigure(0, weight=3)
         self.columnconfigure(1, weight=1)
@@ -409,8 +409,8 @@ class DeleteUser(tb.Toplevel):
         self.destroy()
 
 def tl_destroy(self, event):
-    from main_window import app
     if not event.widget.winfo_exists():
+        
         print("IM DESTROYED")
 
 

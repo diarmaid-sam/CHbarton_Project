@@ -22,6 +22,7 @@ from db_queries import *
 
 class DashBoard(tb.Frame):
     def __init__(self, container):
+
         
         super().__init__(container, border=2, height=600, width=800, bootstyle="primary")   
         self.columnconfigure(0, weight=1)
@@ -60,16 +61,17 @@ class DashBoard(tb.Frame):
 
         # variables to keep track of the actual value of total items, total items that are short-dated, and total expired items
         # TODO query database to get realtime data for these labels
-        self.total_items = tk.StringVar(value="17")
-        self.total_shortdated = tk.StringVar(value="6")
-        self.total_expired = tk.StringVar(value="2")
+        # CALL db.queries function to get values
+        self.total_items = tk.StringVar(value=item_state()) 
+        self.total_shortdated = tk.StringVar(value=item_state("short"))
+        self.total_expired = tk.StringVar(value=item_state("expired"))
         # the number of items indate is expressed as (TOTAL - (SHORTDATED + EXPIRED))
         self.total_indate = tk.StringVar(value=(int(self.total_items.get())-(int(self.total_shortdated.get())+int(self.total_expired.get()))))
 
         # create a progress bar and align vertically
         total_items_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='success')
         # the value is equivalent to the total number of indate items (total-(shortdated+expired)) expressed as a percentage
-        total_items_pb['value'] = ((int(self.total_items.get())-(int(self.total_shortdated.get())+int(self.total_expired.get())))/int(self.total_items.get())*100)
+        total_items_pb['value'] = (int(self.total_indate.get())/int(self.total_items.get())*100)
         total_items_pb.grid(column=0, row=0, sticky='ns', padx=(0, 12), rowspan=2)
 
         items_shortdated_pb = tb.Progressbar(self.shop_status, orient='vertical', mode='determinate', bootstyle='warning')
@@ -375,4 +377,6 @@ if __name__ == "__main__":
     
     app.mainloop()
     
+def run_app():
+    return
     

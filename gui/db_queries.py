@@ -115,3 +115,60 @@ def submit_addItems(product_id, exp_month, exp_year, quantity):
     conn.commit()
     c.close()
     return
+
+def item_state(type="all"):
+    conn = sqlite3.connect("shop_inventory.db")
+    c = conn.cursor()
+
+    current_date = datetime.datetime.now()
+
+    # Format date as string
+    curr_month = current_date.month
+    curr_year = current_date.year
+
+    sd_var = (3)-1
+    m_upperbound = 1 if curr_month + sd_var == 13 else 2
+    
+    if type == "expired":
+        # formated string for querying expiry dates
+        query = f"""SELECT SUM(quantity) FROM inventory 
+        WHERE expiry_date_year < {curr_year} 
+        OR expiry_date_year == {curr_year} AND expiry_date_year < {curr_month};"""
+        # number of expired items (of a year less than )
+        c.execute(query)
+        count = c.fetchone()[0]
+        
+    elif type == "short":
+        if curr_month >= 11:
+            # ternary operator to assign the upper bound month to variable (1 if month is 11th or 2 if month is 12)
+            # TODO not curr flexible to changing definition of short-dated. can be modified later
+            
+            query = f"""SELECT SUM(quantity) FROM inventory 
+            WHERE expiry_date_year == {curr_year} AND expiry_date_month <= 12 AND expiry_date_month >= {curr_month}
+            OR expiry_date_year == {curr_year + 1} AND expiry_date_month <= {m_upperbound};"""
+            c.execute(query)   
+            
+        else:
+            query = f"""SELECT SUM(quantity) FROM inventory 
+            WHERE expiry_date_year == {curr_year} AND expiry_date_month >= {curr_month} AND expiry_date_month <= {curr_month + sd_var};"""
+            c.execute(query)
+        count = c.fetchone()[0]
+        
+    else:
+        query = f"SELECT SUM(quantity) FROM inventory;"
+        c.execute(query)
+        count = c.fetchone()[0]
+
+        ## CODE FOR COUNTING 'IN-DATE' ITEMS [NOT IN USE]
+        # if curr_month >= 11:
+        #     query = f"""SELECT SUM(quantity) FROM inventory
+        #     WHERE expiry_date_year == {curr_year + 1} AND expiry_date_month >= {m_upperbound}"""
+        #     c.execute("")
+        # else:
+        #     query = f"""SELECT SUM(quantity) FROM inventory
+        #     WHERE expiry_date_year == {curr_year} AND expiry_date_month >= {curr_month + sd_var};
+        #     """
+    # check the return value isn't none
+    count = count if count != None else 0
+    return count
+    c.close()
