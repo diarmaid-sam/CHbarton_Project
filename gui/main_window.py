@@ -167,6 +167,10 @@ class DashBoard(tb.Frame):
         self.rf_rcntAdded.rowconfigure(0, weight=1)
         self.rf_rcntAdded.columnconfigure(0, weight=1)
 
+        rcnt_table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'date_added'], None, 'all', True, master=self.rf_rcntAdded)
+        rcnt_table.grid(column=0, row=0, sticky='nsew')
+
+
 
         self.rf_bottom = tb.LabelFrame(self.right_frame, text=' my section ',border=2, bootstyle='danger', padding=(4))
         self.rf_bottom.grid(column=0, row=1, sticky='nsew')
@@ -177,18 +181,30 @@ class DashBoard(tb.Frame):
         self.selected_staff = tk.StringVar()
         # using self.selected_staff.get you can retrieve the currently selected user. This can then be used to show the relevant section information
         # when passed into the function
-        rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, 'user', *users_list, bootstyle='danger-outline')
-        rf_selectUser.grid(column=0, row=0, padx=7, sticky='ne')
-
+        
         # table frame for 'my section' section of the dashboard
-        self.my_section_table = tb.Frame(self.rf_bottom, border=2, relief='solid', padding=10)
+        self.my_section_table = tb.Frame(self.rf_bottom)
         self.my_section_table.grid(column=0, row=1, sticky='nsew')
-        temp_label = tb.Label(self.my_section_table, text="im a label")
-        temp_label.grid(column=0, row=0, sticky='nsew')
 
+        rf_selectUser = tb.OptionMenu(self.rf_bottom, self.selected_staff, 'user', *users_list, bootstyle='danger-outline')
+        rf_selectUser.grid(column=0, row=0, sticky='ne')
+        
+        self.user_tables = {}
+
+        for user in users_list:
+            table = get_table_data(['product_name', 'expiry_date_month', 'expiry_date_year', 'quantity', 'date_added'], f'WHERE username = "{user[0]}"', 'all', True, master=self.my_section_table)
+            table.grid(column=0, row=0)
+            self.user_tables[user[0]] = table
+
+        # track changes to self.selected_staff var. If changes are made (i.e. optionMenu is selected),
+        self.selected_staff.trace("w", self.raise_table)
 
         self.grid()
-
+        
+    def raise_table(self, *args):
+        self.user_tables[self.selected_staff.get()].tkraise()
+        return 
+    
 class Inventory(ttk.Frame):
     def __init__(self, container):
         super().__init__(container, height=600, width=800)
@@ -271,9 +287,9 @@ class Users(ttk.Frame):
         self.manage_users_frame.columnconfigure(2, weight=1)
 
         # manage_users_frame widgets
-        # TODO make these buttons functional (create toplevel window)
         add_user_button = tb.Button(self.manage_users_frame, text='add users', padding=(0, 10), bootstyle='outline-success', command= lambda:AddUser(self))
         add_user_button.grid(column=0, row=0, sticky='nsew', padx=5, pady=5)
+        # TODO change name for user.
         edit_user_button = tb.Button(self.manage_users_frame, text='edit users', padding=(0, 10), bootstyle='outline')
         edit_user_button.grid(column=1, row=0, sticky='nsew', padx=(0, 5), pady=5)
         remove_user_button = tb.Button(self.manage_users_frame, text='remove users', padding=(0, 10), bootstyle='outline-danger', command= lambda:DeleteUser(self, app))
@@ -334,7 +350,7 @@ class History(ttk.Frame):
 
 class MainFrame(tb.Frame):
     def __init__(self, master_Window):
-        super().__init__(master_Window, padding=(10), width=800, height=800)
+        super().__init__(master_Window, padding=(10))
 
         self.__navBar()
 
@@ -349,6 +365,7 @@ class MainFrame(tb.Frame):
         
         self.show_frame(DashBoard)
         self.grid()
+        
 
     # can probably keep track of which frame is opened at any given time to be able to then switch to that frame on-boot 
     def show_frame(self, cont):
@@ -372,6 +389,12 @@ class MainFrame(tb.Frame):
 if __name__ == "__main__":
     
     app = tb.Window("Software", themename="superhero", minsize=(800, 800))
+    # get the roots screen width and height
+    screen_width = app.winfo_screenwidth()
+    screen_height = app.winfo_screenheight()
+    # Set the window size to the screen size
+    app.geometry(f"{screen_width}x{screen_height}")
+
     MainFrame(app)
     app.place_window_center()
     

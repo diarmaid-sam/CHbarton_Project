@@ -294,7 +294,8 @@ class ItemDetails(tb.Toplevel):
         self.total_items_frame.columnconfigure(0, weight=1)
         self.total_items_frame.rowconfigure(0, weight=1)
         ## total_items_var queries the database for the total number of this particular product.
-        total_items_var = StringVar(value=(get_table_data(['COUNT (*)'], 'WHERE product_id=2', 'products', False))[0][0])
+        print(item_id)
+        total_items_var = StringVar(value=(get_table_data(['SUM(quantity)'], f'WHERE product_id={item_id}', 'inventory', False))[0][0])
         total_items_label = tb.Label(self.total_items_frame, text=(total_items_var.get()), font=('Arial',40), relief='solid', anchor='center')
 
         total_items_label.grid(column=0, row=0, sticky='nsew')
